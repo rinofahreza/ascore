@@ -33,7 +33,7 @@ export default function Index({ auth }) {
                     {/* Header */}
 
 
-                    <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                    <div className="grid grid-cols-3 gap-x-2 gap-y-1">
                         {menus.map((menu, index) => (
                             <Link
                                 href={menu.href || '#'}
