@@ -201,6 +201,4 @@ require __DIR__ . '/auth.php';
 Route::get('/achievements', function () {
     return Inertia::render('Achievements/Index');
 })->name('achievements.index');
-Route::get('/kalender-akademik', function () {
-    return Inertia::render('KalenderAkademik/Index');
-})->name('kalender.akademik');
+Route::resource('kalender-akademik', App\Http\Controllers\KalenderAkademikController::class)->except(['show']);

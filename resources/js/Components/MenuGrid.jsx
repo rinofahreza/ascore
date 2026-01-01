@@ -25,7 +25,7 @@ export default function MenuGrid() {
         {
             name: 'K.Akademik',
             image: '/images/menu-ekskul-v2.png',
-            href: '/kalender-akademik',
+            href: '/kalender-akademik?readonly=true',
         },
         {
             name: 'Kesehatan',

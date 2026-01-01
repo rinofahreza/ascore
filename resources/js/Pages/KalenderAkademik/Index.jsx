@@ -1,18 +1,34 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import BottomNav from '@/Components/BottomNav';
-import { Head } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, useForm, router } from '@inertiajs/react'; // Added router import
+import { useState, useEffect } from 'react';
+import Modal from '@/Components/Modal';
+import InputLabel from '@/Components/InputLabel';
+import TextInput from '@/Components/TextInput';
+import InputError from '@/Components/InputError';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
-export default function Index({ auth }) {
+export default function Index({ auth, events, can }) {
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingEvent, setEditingEvent] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(null);
 
-    // Mock Events
-    const events = [
-        { date: 5, month: 0, year: 2026, type: 'holiday', title: 'Tahun Baru Masehi' },
-        { date: 15, month: 0, year: 2026, type: 'academic', title: 'Awal Semester Genap' },
-        { date: 20, month: 0, year: 2026, type: 'exam', title: 'Ujian Susulan' },
-        { date: 1, month: 0, year: 2026, type: 'holiday', title: 'Libur Tahun Baru' },
-    ];
+    // Check for readonly mode from URL
+    const isReadOnly = new URLSearchParams(window.location.search).get('readonly') === 'true';
+
+    // Override permissions if in read-only mode
+    const effectiveCan = isReadOnly ? { create: false, edit: false, delete: false } : can;
+
+    const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
+        tanggal: '',
+        judul: '',
+        tipe: 'academic',
+        warna: '#3b82f6', // Default blue
+        keterangan: '',
+    });
 
     const months = [
         'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -37,6 +53,60 @@ export default function Index({ auth }) {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
     };
 
+    const openCreateModal = (date = null) => {
+        reset();
+        setEditingEvent(null);
+        if (date) {
+            // Format date to YYYY-MM-DD for input type="date"
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const day = String(date).padStart(2, '0');
+            setData('tanggal', `${year}-${month}-${day}`);
+        } else {
+            setData('tanggal', new Date().toISOString().split('T')[0]);
+        }
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (event) => {
+        setEditingEvent(event);
+        setData({
+            tanggal: event.full_date,
+            judul: event.title,
+            tipe: event.type,
+            warna: event.color || '#3b82f6',
+            keterangan: event.description || '',
+        });
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setEditingEvent(null);
+        reset();
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (editingEvent) {
+            put(route('kalender-akademik.update', editingEvent.id), {
+                onSuccess: () => closeModal(),
+            });
+        } else {
+            post(route('kalender-akademik.store'), {
+                onSuccess: () => closeModal(),
+            });
+        }
+    };
+
+    const handleDelete = () => {
+        if (confirm('Apakah Anda yakin ingin menghapus event ini?')) {
+            destroy(route('kalender-akademik.destroy', editingEvent.id), {
+                onSuccess: () => closeModal(),
+            });
+        }
+    };
+
     const renderCalendarDays = () => {
         const totalDays = getDaysInMonth(currentDate);
         const firstDay = getFirstDayOfMonth(currentDate);
@@ -44,7 +114,7 @@ export default function Index({ auth }) {
 
         // Empty cells for previous month
         for (let i = 0; i < firstDay; i++) {
-            calendarDays.push(<div key={`empty-${i}`} className="h-10 sm:h-14"></div>);
+            calendarDays.push(<div key={`empty-${i}`} className="h-14 sm:h-20 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl"></div>);
         }
 
         // Days of current month
@@ -58,30 +128,38 @@ export default function Index({ auth }) {
                 (e) => e.date === day && e.month === currentDate.getMonth() && e.year === currentDate.getFullYear()
             );
 
-            let eventIndicator = null;
-            if (dayEvents.length > 0) {
-                const type = dayEvents[0].type;
-                const colorClass =
-                    type === 'holiday' ? 'bg-red-400' :
-                        type === 'exam' ? 'bg-yellow-400' : 'bg-blue-400';
-
-                eventIndicator = (
-                    <div className={`w-1.5 h-1.5 rounded-full ${colorClass} mx-auto mt-1`}></div>
-                );
-            }
-
             calendarDays.push(
                 <div
                     key={day}
-                    className={`h-10 sm:h-14 flex flex-col items-center justify-center rounded-xl relative group transition-colors cursor-pointer
+                    onClick={() => effectiveCan.create && openCreateModal(day)}
+                    className={`h-14 sm:h-20 flex flex-col items-center justify-start pt-2 rounded-xl relative group transition-all cursor-pointer border
                         ${isToday
-                            ? 'bg-[var(--color-primary)] text-white font-bold shadow-md'
-                            : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'
+                            ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 dark:bg-[var(--color-primary)]/10'
+                            : 'border-transparent bg-white dark:bg-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md'
                         }
                     `}
                 >
-                    <span className="text-sm sm:text-base">{day}</span>
-                    {eventIndicator}
+                    <span className={`text-sm sm:text-base font-semibold w-7 h-7 flex items-center justify-center rounded-full mb-1
+                         ${isToday ? 'bg-[var(--color-primary)] text-white' : 'text-gray-700 dark:text-gray-200'}
+                    `}>
+                        {day}
+                    </span>
+
+                    {/* Event Dots Container */}
+                    <div className="flex flex-wrap justify-center gap-1 w-full px-1">
+                        {dayEvents.map((event, idx) => (
+                            <div
+                                key={idx}
+                                title={event.title}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (effectiveCan.edit) openEditModal(event);
+                                }}
+                                className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full hover:scale-150 transition-transform"
+                                style={{ backgroundColor: event.color || (event.type === 'holiday' ? '#ef4444' : event.type === 'exam' ? '#eab308' : '#3b82f6') }}
+                            ></div>
+                        ))}
+                    </div>
                 </div>
             );
         }
@@ -91,7 +169,7 @@ export default function Index({ auth }) {
 
     const currentMonthEvents = events.filter(
         (e) => e.month === currentDate.getMonth() && e.year === currentDate.getFullYear()
-    );
+    ).sort((a, b) => a.date - b.date);
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -100,14 +178,28 @@ export default function Index({ auth }) {
             <div className="pt-header pb-24 bg-gray-50 dark:bg-gray-900 min-h-screen">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-                    {/* Header Title */}
-                    <div className="mb-8 text-center sm:text-left">
-                        <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--color-primary)] to-blue-600 bg-clip-text text-transparent mb-1">
-                            Kalender Akademik
-                        </h1>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Info libur, ujian, dan kegiatan akademik lainnya.
-                        </p>
+                    {/* Header Title with Add Button */}
+                    <div className="mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div className="text-center sm:text-left">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--color-primary)] to-blue-600 bg-clip-text text-transparent mb-1">
+                                Kalender Akademik
+                            </h1>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Info libur, ujian, dan kegiatan akademik lainnya.
+                            </p>
+                        </div>
+
+                        {effectiveCan.create && (
+                            <button
+                                onClick={() => openCreateModal()}
+                                className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white rounded-xl shadow-lg shadow-[var(--color-primary)]/20 transition-all active:scale-95"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                                Tambah Event
+                            </button>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -123,7 +215,7 @@ export default function Index({ auth }) {
                                             </svg>
                                         </button>
                                         <div className="text-center">
-                                            <h2 className="text-xl font-bold">
+                                            <h2 className="text-xl font-bold capitalize">
                                                 {months[currentDate.getMonth()]}
                                             </h2>
                                             <span className="text-sm opacity-80 font-medium">
@@ -159,34 +251,39 @@ export default function Index({ auth }) {
 
                         {/* Right Column: Events List */}
                         <div>
-                            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 h-full">
+                            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 h-full sticky top-24">
                                 <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
                                     <span className="w-1 h-6 bg-[var(--color-primary)] rounded-full"></span>
-                                    Agenda Bulan Ini
+                                    Agenda Bulan {months[currentDate.getMonth()]}
                                 </h3>
-                                <div className="space-y-4">
+                                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                                     {currentMonthEvents.length > 0 ? (
                                         currentMonthEvents.map((event, index) => (
                                             <div
                                                 key={index}
-                                                className="bg-gray-50 dark:bg-gray-700/50 rounded-2xl p-4 border border-gray-100 dark:border-gray-600 flex items-start gap-4 group hover:scale-[1.02] transition-transform duration-200"
+                                                onClick={() => effectiveCan.edit && openEditModal(event)}
+                                                className={`bg-gray-50 dark:bg-gray-700/50 rounded-2xl p-4 border border-gray-100 dark:border-gray-600 flex items-start gap-4 group hover:scale-[1.02] transition-transform duration-200 cursor-pointer`}
                                             >
                                                 <div className={`
-                                                    w-10 h-10 rounded-xl flex flex-col items-center justify-center shrink-0
-                                                    ${event.type === 'holiday' ? 'bg-red-100 text-red-600' :
-                                                        event.type === 'exam' ? 'bg-yellow-100 text-yellow-600' :
-                                                            'bg-blue-100 text-blue-600'}
-                                                `}>
+                                                    w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0 text-white shadow-md
+                                                `} style={{ backgroundColor: event.color || '#3b82f6' }}>
                                                     <span className="text-[10px] font-bold uppercase leading-none mb-0.5">{months[event.month].substring(0, 3)}</span>
-                                                    <span className="text-sm font-black leading-none">{event.date}</span>
+                                                    <span className="text-lg font-black leading-none">{event.date}</span>
                                                 </div>
                                                 <div>
                                                     <h4 className="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight mb-1">
                                                         {event.title}
                                                     </h4>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                                                        {event.type === 'academic' ? 'Kegiatan Akademik' : event.type}
-                                                    </p>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 capitalize">
+                                                            {event.type}
+                                                        </span>
+                                                    </div>
+                                                    {event.description && (
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                                                            {event.description}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))
@@ -204,11 +301,123 @@ export default function Index({ auth }) {
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
             <BottomNav />
+
+            {/* Modal Form */}
+            <Modal show={isModalOpen} onClose={closeModal}>
+                <div className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+                        {editingEvent ? 'Edit Event' : 'Tambah Event Baru'}
+                    </h2>
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+
+                        {/* Tanggal */}
+                        <div>
+                            <InputLabel htmlFor="tanggal" value="Tanggal" />
+                            <TextInput
+                                id="tanggal"
+                                type="date"
+                                className="mt-1 block w-full"
+                                value={data.tanggal}
+                                onChange={(e) => setData('tanggal', e.target.value)}
+                                required
+                            />
+                            <InputError message={errors.tanggal} className="mt-2" />
+                        </div>
+
+                        {/* Judul */}
+                        <div>
+                            <InputLabel htmlFor="judul" value="Judul Event" />
+                            <TextInput
+                                id="judul"
+                                type="text"
+                                className="mt-1 block w-full"
+                                value={data.judul}
+                                onChange={(e) => setData('judul', e.target.value)}
+                                placeholder="Contoh: Rapat Guru"
+                                required
+                            />
+                            <InputError message={errors.judul} className="mt-2" />
+                        </div>
+
+                        {/* Tipe & Warna */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <InputLabel htmlFor="tipe" value="Tipe Event" />
+                                <select
+                                    id="tipe"
+                                    className="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
+                                    value={data.tipe}
+                                    onChange={(e) => setData('tipe', e.target.value)}
+                                >
+                                    <option value="academic">Akademik</option>
+                                    <option value="holiday">Libur</option>
+                                    <option value="exam">Ujian</option>
+                                    <option value="activity">Kegiatan</option>
+                                    <option value="other">Lainnya</option>
+                                </select>
+                                <InputError message={errors.tipe} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="warna" value="Warna Label" />
+                                <div className="flex items-center gap-2 mt-1">
+                                    <input
+                                        type="color"
+                                        value={data.warna}
+                                        onChange={(e) => setData('warna', e.target.value)}
+                                        className="h-10 w-12 rounded cursor-pointer border-0 p-0"
+                                    />
+                                    <TextInput
+                                        type="text"
+                                        className="block w-full uppercase"
+                                        value={data.warna}
+                                        onChange={(e) => setData('warna', e.target.value)}
+                                        placeholder="#000000"
+                                    />
+                                </div>
+                                <InputError message={errors.warna} className="mt-2" />
+                            </div>
+                        </div>
+
+                        {/* Keterangan */}
+                        <div>
+                            <InputLabel htmlFor="keterangan" value="Keterangan (Opsional)" />
+                            <textarea
+                                id="keterangan"
+                                className="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
+                                rows="3"
+                                value={data.keterangan}
+                                onChange={(e) => setData('keterangan', e.target.value)}
+                            ></textarea>
+                            <InputError message={errors.keterangan} className="mt-2" />
+                        </div>
+
+                        <div className="flex justify-between items-center mt-6">
+                            {editingEvent ? (
+                                <DangerButton type="button" onClick={handleDelete} disabled={processing}>
+                                    Hapus Event
+                                </DangerButton>
+                            ) : (
+                                <div></div> // Spacer
+                            )}
+
+                            <div className="flex gap-2">
+                                <SecondaryButton onClick={closeModal} disabled={processing}>
+                                    Batal
+                                </SecondaryButton>
+                                <PrimaryButton disabled={processing}>
+                                    {editingEvent ? 'Simpan Perubahan' : 'Tambah Event'}
+                                </PrimaryButton>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </Modal>
         </AuthenticatedLayout>
     );
 }
