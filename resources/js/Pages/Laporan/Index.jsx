@@ -38,7 +38,7 @@ export default function Index({ auth }) {
                             <Link
                                 href={menu.href || '#'}
                                 key={index}
-                                className="block"
+                                className="block transition-transform active:scale-95 hover:scale-105"
                             >
                                 <img
                                     src={menu.image}
