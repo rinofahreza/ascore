@@ -473,7 +473,7 @@ export default function AuthenticatedLayout({ header, children, hideNav }) {
                             )}
 
                             {/* Akademik Dropdown */}
-                            {(hasPermission('periode_akademik.view') || hasPermission('jadwal_pelajaran.view')) && (
+                            {(hasPermission('periode_akademik.view') || hasPermission('jadwal_pelajaran.view') || hasPermission('kalender.view')) && (
                                 <div>
                                     <button
                                         onClick={() => setIsAkademikOpen(!isAkademikOpen)}
