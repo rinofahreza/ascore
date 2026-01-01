@@ -457,6 +457,7 @@ export default function Index({ auth, jadwals, cabangs, periodeAkademiks, active
     return (
         <AuthenticatedLayout
             user={auth.user}
+            forceMenu={true}
         >
             <Head title="Jadwal Pelajaran" />
 

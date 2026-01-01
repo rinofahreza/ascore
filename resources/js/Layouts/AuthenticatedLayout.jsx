@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import useThemeColor from '@/Hooks/useThemeColor';
 import { Link, usePage } from '@inertiajs/react';
 
-export default function AuthenticatedLayout({ header, children, hideNav }) {
+export default function AuthenticatedLayout({ header, children, hideNav, forceMenu = false }) {
     const { currentColor, changeColor, colors } = useThemeColor();
     const { url, props } = usePage();
     const user = props.auth?.user;
@@ -28,7 +28,7 @@ export default function AuthenticatedLayout({ header, children, hideNav }) {
 
     // Determine if we should show back button instead of hamburger
     const subPages = ['/profile', '/security', '/nilai', '/profile/edit', '/absensi', '/jadwal', '/berkas', '/jurnal', '/settings', '/kalender-akademik', '/notifikasi', '/achievements', '/kesehatan', '/laporan'];
-    const isSubPage = subPages.some(page => url.startsWith(page));
+    const isSubPage = !forceMenu && subPages.some(page => url.startsWith(page));
 
     // Permission Helper
     const hasPermission = (permission) => {

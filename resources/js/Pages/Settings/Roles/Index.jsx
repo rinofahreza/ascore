@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import BottomNav from '@/Components/BottomNav';
 import { IconPlus, IconPencil, IconTrash, IconShieldLock } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 
@@ -135,6 +136,7 @@ export default function Index({ roles }) {
                     </div>
                 </div>
             </div>
+            <BottomNav />
         </AuthenticatedLayout>
     );
 }
