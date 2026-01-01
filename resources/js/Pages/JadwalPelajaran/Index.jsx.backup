@@ -1,0 +1,432 @@
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, Link, router } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import BottomNav from '@/Components/BottomNav';
+
+export default function Index({ auth, jadwals, cabangs, periodeAkademiks, activePeriode, filters }) {
+    const [confirmDialog, setConfirmDialog] = useState({
+        isOpen: false,
+        jadwalId: null,
+        jadwalInfo: ''
+    });
+
+    // Filter states
+    const [filterPeriode, setFilterPeriode] = useState(filters?.periode_akademik_id || activePeriode?.id || '');
+    const [filterCabang, setFilterCabang] = useState(filters?.cabang_id || '');
+    const [filterDepartemen, setFilterDepartemen] = useState(filters?.departemen_id || '');
+    const [filterHari, setFilterHari] = useState(filters?.hari || '');
+    const [filterKelas, setFilterKelas] = useState(filters?.kelas_id || '');
+    const [filterMataPelajaran, setFilterMataPelajaran] = useState(filters?.mata_pelajaran_id || '');
+    const [filterGuru, setFilterGuru] = useState(filters?.guru_id || '');
+
+    const [departemens, setDepartemens] = useState([]);
+    const [kelass, setKelass] = useState([]);
+    const [mataPelajarans, setMataPelajarans] = useState([]);
+    const [gurus, setGurus] = useState([]);
+    const [loadingDepartemen, setLoadingDepartemen] = useState(false);
+    const [loadingKelas, setLoadingKelas] = useState(false);
+    const [loadingMataPelajaran, setLoadingMataPelajaran] = useState(false);
+    const [loadingGuru, setLoadingGuru] = useState(false);
+
+    const hariOptions = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+
+    // Fetch departemen when filter cabang changes
+    useEffect(() => {
+        if (filterCabang) {
+            setLoadingDepartemen(true);
+            axios.get(route('api.departemen.by-cabang', filterCabang))
+                .then(response => {
+                    setDepartemens(response.data);
+                    setLoadingDepartemen(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching departemen:', error);
+                    setLoadingDepartemen(false);
+                });
+        } else {
+            setDepartemens([]);
+            setFilterDepartemen('');
+        }
+    }, [filterCabang]);
+
+    // Fetch kelas, mata pelajaran, and guru when departemen changes
+    useEffect(() => {
+        if (filterDepartemen) {
+            // Fetch Kelas
+            setLoadingKelas(true);
+            axios.get(route('api.kelas.by-departemen', filterDepartemen))
+                .then(response => {
+                    setKelass(response.data);
+                    setLoadingKelas(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching kelas:', error);
+                    setLoadingKelas(false);
+                });
+
+            // Fetch Mata Pelajaran
+            setLoadingMataPelajaran(true);
+            axios.get(route('api.mata-pelajaran.by-departemen', filterDepartemen))
+                .then(response => {
+                    setMataPelajarans(response.data);
+                    setLoadingMataPelajaran(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching mata pelajaran:', error);
+                    setLoadingMataPelajaran(false);
+                });
+
+            // Fetch Guru
+            setLoadingGuru(true);
+            axios.get(route('api.guru.by-departemen', filterDepartemen))
+                .then(response => {
+                    setGurus(response.data);
+                    setLoadingGuru(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching guru:', error);
+                    setLoadingGuru(false);
+                });
+        } else {
+            setKelass([]);
+            setMataPelajarans([]);
+            setGurus([]);
+            setFilterKelas('');
+            setFilterMataPelajaran('');
+            setFilterGuru('');
+        }
+    }, [filterDepartemen]);
+
+    const handleDelete = (id) => {
+        router.delete(route('jadwal-pelajaran.destroy', id), {
+            onSuccess: () => {
+                setConfirmDialog({ isOpen: false, jadwalId: null, jadwalInfo: '' });
+            }
+        });
+    };
+
+    // Apply filters
+    const applyFilters = () => {
+        router.get(route('jadwal-pelajaran.index'), {
+            periode_akademik_id: filterPeriode,
+            cabang_id: filterCabang,
+            departemen_id: filterDepartemen,
+            hari: filterHari,
+            kelas_id: filterKelas,
+            mata_pelajaran_id: filterMataPelajaran,
+            guru_id: filterGuru,
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
+    // Clear filters
+    const clearFilters = () => {
+        setFilterCabang('');
+        setFilterDepartemen('');
+        setFilterHari('');
+        setFilterKelas('');
+        setFilterMataPelajaran('');
+        setFilterGuru('');
+        router.get(route('jadwal-pelajaran.index'), {}, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
+    return (
+        <AuthenticatedLayout
+            user={auth.user}
+            header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Jadwal Pelajaran</h2>}
+        >
+            <Head title="Jadwal Pelajaran" />
+
+            <div className="py-12 pb-32">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                        <div className="p-6">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Daftar Jadwal Pelajaran</h3>
+                                <Link
+                                    href={route('jadwal-pelajaran.create')}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                                >
+                                    + Tambah Jadwal
+                                </Link>
+                            </div>
+
+                            {/* Filter Section */}
+                            <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Filter</h4>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Periode Akademik</label>
+                                        <select
+                                            value={filterPeriode}
+                                            onChange={(e) => setFilterPeriode(e.target.value)}
+                                            className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        >
+                                            <option value="">Semua</option>
+                                            {periodeAkademiks.map((periode) => (
+                                                <option key={periode.id} value={periode.id}>{periode.nama}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Cabang</label>
+                                        <select
+                                            value={filterCabang}
+                                            onChange={(e) => setFilterCabang(e.target.value)}
+                                            className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        >
+                                            <option value="">Semua</option>
+                                            {cabangs.map((cabang) => (
+                                                <option key={cabang.id} value={cabang.id}>{cabang.nama}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Departemen</label>
+                                        <select
+                                            value={filterDepartemen}
+                                            onChange={(e) => setFilterDepartemen(e.target.value)}
+                                            disabled={!filterCabang || loadingDepartemen}
+                                            className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:opacity-50"
+                                        >
+                                            <option value="">
+                                                {loadingDepartemen ? 'Loading...' : !filterCabang ? 'Pilih Cabang' : 'Semua'}
+                                            </option>
+                                            {departemens.map((departemen) => (
+                                                <option key={departemen.id} value={departemen.id}>{departemen.nama}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Hari</label>
+                                        <select
+                                            value={filterHari}
+                                            onChange={(e) => setFilterHari(e.target.value)}
+                                            className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        >
+                                            <option value="">Semua</option>
+                                            {hariOptions.map((hari) => (
+                                                <option key={hari} value={hari}>{hari}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Kelas</label>
+                                        <select
+                                            value={filterKelas}
+                                            onChange={(e) => setFilterKelas(e.target.value)}
+                                            disabled={!filterDepartemen || loadingKelas}
+                                            className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:opacity-50"
+                                        >
+                                            <option value="">
+                                                {loadingKelas ? 'Loading...' : !filterDepartemen ? 'Pilih Dept' : 'Semua'}
+                                            </option>
+                                            {kelass.map((kelas) => (
+                                                <option key={kelas.id} value={kelas.id}>{kelas.nama}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Mata Pelajaran</label>
+                                        <select
+                                            value={filterMataPelajaran}
+                                            onChange={(e) => setFilterMataPelajaran(e.target.value)}
+                                            disabled={!filterDepartemen || loadingMataPelajaran}
+                                            className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:opacity-50"
+                                        >
+                                            <option value="">
+                                                {loadingMataPelajaran ? 'Loading...' : !filterDepartemen ? 'Pilih Dept' : 'Semua'}
+                                            </option>
+                                            {mataPelajarans.map((mapel) => (
+                                                <option key={mapel.id} value={mapel.id}>{mapel.nama}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Guru</label>
+                                        <select
+                                            value={filterGuru}
+                                            onChange={(e) => setFilterGuru(e.target.value)}
+                                            disabled={!filterDepartemen || loadingGuru}
+                                            className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:opacity-50"
+                                        >
+                                            <option value="">
+                                                {loadingGuru ? 'Loading...' : !filterDepartemen ? 'Pilih Dept' : 'Semua'}
+                                            </option>
+                                            {gurus.map((guru) => (
+                                                <option key={guru.id} value={guru.id}>{guru.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center space-x-2 mt-4">
+                                    <button
+                                        onClick={applyFilters}
+                                        className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition"
+                                    >
+                                        Terapkan
+                                    </button>
+                                    <button
+                                        onClick={clearFilters}
+                                        className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 transition"
+                                    >
+                                        Reset
+                                    </button>
+                                </div>
+                            </div>
+
+                            {jadwals.data.length === 0 ? (
+                                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                                    Belum ada data jadwal pelajaran
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                            <thead className="bg-gray-50 dark:bg-gray-700">
+                                                <tr>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">No</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Hari</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Jam</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Kelas</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Mata Pelajaran</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Guru</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Cabang</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Departemen</th>
+                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                                {jadwals.data.map((jadwal, index) => (
+                                                    <tr key={jadwal.id}>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                            {jadwals.from + index}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                            {jadwal.hari}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                            {jadwal.jam_pelajaran?.jam_mulai} - {jadwal.jam_pelajaran?.jam_selesai}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                            {jadwal.kelas?.nama || '-'}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                            {jadwal.mata_pelajaran?.nama || '-'}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                            {jadwal.guru?.user?.name || '-'}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                            {jadwal.cabang?.nama || '-'}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                            {jadwal.departemen?.nama || '-'}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                                            <Link
+                                                                href={route('jadwal-pelajaran.edit', jadwal.id)}
+                                                                className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
+                                                            >
+                                                                Edit
+                                                            </Link>
+                                                            <button
+                                                                onClick={() => setConfirmDialog({
+                                                                    isOpen: true,
+                                                                    jadwalId: jadwal.id,
+                                                                    jadwalInfo: `${jadwal.hari} - ${jadwal.kelas?.nama} - ${jadwal.mata_pelajaran?.nama}`
+                                                                })}
+                                                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                                            >
+                                                                Hapus
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Pagination */}
+                                    {jadwals.last_page > 1 && (
+                                        <div className="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
+                                            <div className="text-sm text-gray-700 dark:text-gray-300">
+                                                Menampilkan <span className="font-medium">{jadwals.from}</span> sampai{' '}
+                                                <span className="font-medium">{jadwals.to}</span> dari{' '}
+                                                <span className="font-medium">{jadwals.total}</span> data
+                                            </div>
+                                            <div className="flex space-x-2">
+                                                {jadwals.links.map((link, index) => (
+                                                    link.url ? (
+                                                        <Link
+                                                            key={index}
+                                                            href={link.url}
+                                                            preserveScroll
+                                                            className={`px-3 py-2 text-sm rounded-lg transition ${link.active
+                                                                ? 'bg-purple-600 text-white'
+                                                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                                                                }`}
+                                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                                        />
+                                                    ) : (
+                                                        <span
+                                                            key={index}
+                                                            className="px-3 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed"
+                                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                                        />
+                                                    )
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Confirm Delete Dialog */}
+            {confirmDialog.isOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Konfirmasi Hapus</h3>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            Apakah Anda yakin ingin menghapus jadwal "<strong>{confirmDialog.jadwalInfo}</strong>"?
+                        </p>
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={() => setConfirmDialog({ isOpen: false, jadwalId: null, jadwalInfo: '' })}
+                                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={() => handleDelete(confirmDialog.jadwalId)}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                            >
+                                Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <BottomNav />
+        </AuthenticatedLayout>
+    );
+}

@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --color-primary: #14b8a6;
+        --color-primary-hover: #0d9488;
+        --color-primary-light: #2dd4bf;
+        --color-primary-rgb: 20, 184, 166;
+    }
+}
+
+/* Safe area support for iOS devices */
+@layer utilities {
+    .safe-area-bottom {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .safe-area-top {
+        padding-top: env(safe-area-inset-top);
+    }
+
+    .safe-area-inset {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .pt-header {
+        padding-top: 0;
+    }
+
+    /* Theme color utilities */
+    .bg-primary {
+        background-color: var(--color-primary);
+    }
+
+    .text-primary {
+        color: var(--color-primary);
+    }
+
+    .border-primary {
+        border-color: var(--color-primary);
+    }
+
+    .hover\:bg-primary:hover {
+        background-color: var(--color-primary-hover);
+    }
+
+    /* Floating heart animation */
+    @keyframes floatHeart {
+        0% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: translateY(-30px) scale(1.3);
+            opacity: 0.8;
+        }
+
+        100% {
+            transform: translateY(-60px) scale(1.5);
+            opacity: 0;
+        }
+    }
+
+    /* Highlight post animation */
+    .highlight-post {
+        animation: highlightPulse 1.5s ease-in-out;
+        box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.3);
+    }
+
+    @keyframes highlightPulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(147, 51, 234, 0);
+        }
+
+        50% {
+            box-shadow: 0 0 0 8px rgba(147, 51, 234, 0.4);
+        }
+    }
+}

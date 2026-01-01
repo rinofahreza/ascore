@@ -1,0 +1,36 @@
+--- TABLE: berkas
+cabangs
+cache
+cache_locks
+departemens
+failed_jobs
+gurus
+item_penilaian
+jadwal_pelajarans
+jam_pelajarans
+job_batches
+jobs
+jurnal_access_codes
+jurnal_mengajar_kehadiran_siswas
+jurnal_mengajars
+karyawans
+kelas
+kelas_siswas
+levels
+mata_pelajarans
+migrations
+nilai_pelajarans
+notifications
+password_reset_tokens
+pelanggaran
+periode_akademiks
+poin
+post_comments
+post_likes
+posts
+roles
+saved_posts
+semester_akademik
+sessions
+siswas
+users ---
