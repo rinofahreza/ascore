@@ -9,24 +9,10 @@ use Illuminate\Support\Facades\Gate;
 
 class KalenderAkademikController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            if ($request->route()->getActionMethod() === 'index') {
-                Gate::authorize('view', KalenderAkademik::class);
-            }
-            return $next($request);
-        })->only('index');
-    }
-
     public function index()
     {
-        // Custom gate check for view since we don't have a model instance yet and policy might strict
-        // Using "kalender.view" permission check via "can" or similar logic usually preferred
-        // But let's assume standard policy mapping or simple permission check
-        if (!auth()->user()->can('kalender.view')) {
-            abort(403);
-        }
+        // Allow public access to index
+        // Permissions for buttons are handled via 'can' prop passed to Inertia
 
         $events = KalenderAkademik::orderBy('tanggal')->get()->map(function ($event) {
             return [
