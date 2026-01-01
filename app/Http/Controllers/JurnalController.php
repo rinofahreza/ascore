@@ -412,30 +412,10 @@ class JurnalController extends Controller
         }
 
         // Fetch Jam Pelajaran associated with the department and branch of the class
-        $jamPelajarans = \App\Models\JamPelajaran::where('cabang_id', $jurnal->cabang_id)
-            ->where('departemen_id', $jurnal->departemen_id)
-            ->orderBy('jam_mulai')
-            ->get();
+        $jamPelajarans = $this->getJamPelajaransForJurnal($jurnal);
 
         // Fetch Students and their existing attendance for this journal
-        $existingAttendance = \App\Models\JurnalMengajarKehadiranSiswa::where('jurnal_mengajar_id', $jurnal->id)
-            ->get()
-            ->keyBy('user_id');
-
-        $students = \App\Models\KelasSiswa::where('kelas_id', $jurnal->kelas_id)
-            ->with('siswa')
-            ->get()
-            ->map(function ($ks) use ($existingAttendance) {
-                $studentId = $ks->siswa->id ?? 0;
-                $attendance = $existingAttendance->get($studentId);
-                return [
-                    'id' => $studentId,
-                    'name' => $ks->siswa->name ?? 'Unknown',
-                    'status' => $attendance ? $attendance->status : 'H', // Use existing status or default 'H'
-                ];
-            })
-            ->sortBy('name')
-            ->values();
+        $students = $this->getStudentsWithAttendance($jurnal);
 
         return Inertia::render('Jurnal/Edit', [
             'jurnal' => [
@@ -539,5 +519,35 @@ class JurnalController extends Controller
         }
 
         return redirect()->route('jurnal.index')->with('success', 'Jurnal berhasil diperbarui.');
+    }
+
+    private function getJamPelajaransForJurnal($jurnal)
+    {
+        return \App\Models\JamPelajaran::where('cabang_id', $jurnal->cabang_id)
+            ->where('departemen_id', $jurnal->departemen_id)
+            ->orderBy('jam_mulai')
+            ->get();
+    }
+
+    private function getStudentsWithAttendance($jurnal)
+    {
+        $existingAttendance = \App\Models\JurnalMengajarKehadiranSiswa::where('jurnal_mengajar_id', $jurnal->id)
+            ->get()
+            ->keyBy('user_id');
+
+        return \App\Models\KelasSiswa::where('kelas_id', $jurnal->kelas_id)
+            ->with('siswa')
+            ->get()
+            ->map(function ($ks) use ($existingAttendance) {
+                $studentId = $ks->siswa->id ?? 0;
+                $attendance = $existingAttendance->get($studentId);
+                return [
+                    'id' => $studentId,
+                    'name' => $ks->siswa->name ?? 'Unknown',
+                    'status' => $attendance ? $attendance->status : 'H',
+                ];
+            })
+            ->sortBy('name')
+            ->values();
     }
 }

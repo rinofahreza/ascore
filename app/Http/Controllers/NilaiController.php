@@ -210,20 +210,9 @@ class NilaiController extends Controller
         $kelas = \App\Models\Kelas::findOrFail($kelas_id);
         $mataPelajaran = \App\Models\MataPelajaran::findOrFail($mata_pelajaran_id);
 
-        // Get students enrolled in this class
-        $students = \App\Models\KelasSiswa::where('kelas_id', $kelas_id)
-            ->with(['siswa'])
-            ->get()
-            ->map(function ($kelasSiswa) {
-                // Get siswa data from siswas table
-                $siswaData = \App\Models\Siswa::where('user_id', $kelasSiswa->siswa_id)->first();
-
-                return [
-                    'id' => $kelasSiswa->siswa_id,
-                    'nis' => $siswaData?->nis ?? '-',
-                    'nama' => $kelasSiswa->siswa?->name ?? 'Unknown',
-                ];
-            });
+        // Get students and grades using helper methods
+        $students = $this->getStudentsForClass($kelas_id);
+        $existingGrades = $this->getExistingGrades($kelas_id, $mata_pelajaran_id);
 
         // Get assessment items for this class and subject
         $items = \App\Models\ItemPenilaian::where('kelas_id', $kelas_id)
@@ -231,20 +220,6 @@ class NilaiController extends Controller
             ->orderBy('jenis')
             ->orderBy('created_at')
             ->get();
-
-        // Get existing grades for all items and students in this class
-        $existingGrades = \App\Models\NilaiPelajaran::where('kelas_id', $kelas_id)
-            ->where('mata_pelajaran_id', $mata_pelajaran_id)
-            ->get()
-            ->groupBy('item_penilaian_id')
-            ->map(function ($grades) {
-                return $grades->keyBy('siswa_id')->map(function ($grade) {
-                    return [
-                        'nilai' => (int) $grade->nilai,
-                        'tanggal_penilaian' => \Carbon\Carbon::parse($grade->tanggal_penilaian)->format('Y-m-d'),
-                    ];
-                });
-            });
 
         // Get active periode and semester
         $activePeriode = \App\Models\PeriodeAkademik::where('status', 'Active')->first();
@@ -256,25 +231,11 @@ class NilaiController extends Controller
         }
 
         return Inertia::render('Nilai/Show', [
-            'jadwal' => [
-                'id' => $jadwal->id,
-            ],
-            'kelas' => [
-                'id' => $kelas->id,
-                'nama' => $kelas->nama,
-            ],
-            'mataPelajaran' => [
-                'id' => $mataPelajaran->id,
-                'nama' => $mataPelajaran->nama,
-            ],
-            'periode' => $activePeriode ? [
-                'id' => $activePeriode->id,
-                'nama' => $activePeriode->nama,
-            ] : null,
-            'semester' => $activeSemester ? [
-                'id' => $activeSemester->id,
-                'nama' => $activeSemester->nama,
-            ] : null,
+            'jadwal' => ['id' => $jadwal->id],
+            'kelas' => ['id' => $kelas->id, 'nama' => $kelas->nama],
+            'mataPelajaran' => ['id' => $mataPelajaran->id, 'nama' => $mataPelajaran->nama],
+            'periode' => $activePeriode ? ['id' => $activePeriode->id, 'nama' => $activePeriode->nama] : null,
+            'semester' => $activeSemester ? ['id' => $activeSemester->id, 'nama' => $activeSemester->nama] : null,
             'students' => $students,
             'items' => $items,
             'existingGrades' => $existingGrades,
@@ -362,5 +323,36 @@ class NilaiController extends Controller
         })->unique(function ($item) {
             return $item['kelas_id'] . '-' . $item['mata_pelajaran_nama'];
         })->values();
+    }
+
+    private function getStudentsForClass($kelas_id)
+    {
+        return \App\Models\KelasSiswa::where('kelas_id', $kelas_id)
+            ->with(['siswa'])
+            ->get()
+            ->map(function ($kelasSiswa) {
+                $siswaData = \App\Models\Siswa::where('user_id', $kelasSiswa->siswa_id)->first();
+                return [
+                    'id' => $kelasSiswa->siswa_id,
+                    'nis' => $siswaData?->nis ?? '-',
+                    'nama' => $kelasSiswa->siswa?->name ?? 'Unknown',
+                ];
+            });
+    }
+
+    private function getExistingGrades($kelas_id, $mata_pelajaran_id)
+    {
+        return \App\Models\NilaiPelajaran::where('kelas_id', $kelas_id)
+            ->where('mata_pelajaran_id', $mata_pelajaran_id)
+            ->get()
+            ->groupBy('item_penilaian_id')
+            ->map(function ($grades) {
+                return $grades->keyBy('siswa_id')->map(function ($grade) {
+                    return [
+                        'nilai' => (int) $grade->nilai,
+                        'tanggal_penilaian' => \Carbon\Carbon::parse($grade->tanggal_penilaian)->format('Y-m-d'),
+                    ];
+                });
+            });
     }
 }

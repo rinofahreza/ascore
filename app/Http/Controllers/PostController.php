@@ -189,6 +189,7 @@ class PostController extends Controller
         $like = $post->likes()->where('user_id', auth()->id())->first();
 
         if ($like) {
+            /** @var \Illuminate\Database\Eloquent\Model $like */
             $like->delete();
             // Optionally: delete notification when unliking
             \App\Models\Notification::where('user_id', $post->user_id)
