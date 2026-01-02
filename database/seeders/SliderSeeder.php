@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Slider;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class SliderSeeder extends Seeder
 {
@@ -47,7 +48,27 @@ class SliderSeeder extends Seeder
             ],
         ];
 
+        // Ensure directory exists
+        if (!Storage::disk('public')->exists('sliders')) {
+            Storage::disk('public')->makeDirectory('sliders');
+        }
+
         foreach ($sliders as $slider) {
+            // Check if file exists in storage, if not try to copy from public/images/slider
+            $storagePath = $slider['gambar'];
+            $filename = basename($storagePath);
+            $sourcePath = public_path("images/slider/{$filename}");
+
+            if (!Storage::disk('public')->exists($storagePath)) {
+                if (file_exists($sourcePath)) {
+                    // Copy file to storage
+                    Storage::disk('public')->put($storagePath, file_get_contents($sourcePath));
+                    $this->command->info("Copied {$filename} to storage.");
+                } else {
+                    $this->command->warn("Source file {$filename} not found in public/images/slider.");
+                }
+            }
+
             Slider::create($slider);
         }
     }
