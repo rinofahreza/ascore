@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import BottomNav from '@/Components/BottomNav';
 import Modal from '@/Components/Modal';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
@@ -95,7 +96,7 @@ export default function Index({ auth, sliders }) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AuthenticatedLayout user={auth.user} forceMenu={true}>
             <Head title="Slider Gambar" />
 
             <div className="py-12">
@@ -139,8 +140,8 @@ export default function Index({ auth, sliders }) {
                                     <div className="absolute top-2 right-2">
                                         <div
                                             className={`px-2 py-1 text-xs font-bold rounded-full ${slider.status
-                                                    ? 'bg-green-500/90 text-white'
-                                                    : 'bg-gray-500/90 text-white'
+                                                ? 'bg-green-500/90 text-white'
+                                                : 'bg-gray-500/90 text-white'
                                                 } cursor-pointer`}
                                             onClick={() => toggleStatus(slider)}
                                         >
@@ -249,6 +250,7 @@ export default function Index({ auth, sliders }) {
                     </form>
                 </div>
             </Modal>
+            <BottomNav />
         </AuthenticatedLayout>
     );
 }
