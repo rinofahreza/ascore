@@ -146,7 +146,7 @@ class PrestasiController extends Controller
         $prestasis = Prestasi::where('is_active', true)
             ->orderBy('urutan', 'asc')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(12);
 
         return Inertia::render('Prestasi/PublicList', [
             'prestasis' => $prestasis

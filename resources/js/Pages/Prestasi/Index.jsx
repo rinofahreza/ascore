@@ -4,6 +4,7 @@ import { IconPlus, IconPencil, IconTrash, IconSearch, IconTrophy, IconMedal, Ico
 import Swal from 'sweetalert2';
 import { useState } from 'react';
 import Pagination from '@/Components/Pagination';
+import BottomNav from '@/Components/BottomNav';
 
 export default function Index({ auth, prestasis, filters }) {
     const [search, setSearch] = useState(filters.search || '');
@@ -60,11 +61,11 @@ export default function Index({ auth, prestasis, filters }) {
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Prestasi GuKar</h2>}
+            header={null}
         >
             <Head title="Prestasi Guru & Karyawan" />
 
-            <div className="py-12">
+            <div className="py-12 pb-28">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6">
@@ -149,8 +150,8 @@ export default function Index({ auth, prestasis, filters }) {
                                                         <button
                                                             onClick={() => toggleStatus(item.id, item.is_active)}
                                                             className={`px-2 py-1 text-xs font-semibold rounded-full ${item.is_active
-                                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                                                    : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                                                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                                                                 }`}
                                                         >
                                                             {item.is_active ? 'Aktif' : 'Nonaktif'}
@@ -192,6 +193,8 @@ export default function Index({ auth, prestasis, filters }) {
                     </div>
                 </div>
             </div>
+
+            <BottomNav />
         </AuthenticatedLayout>
     );
 }

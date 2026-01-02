@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { IconTrophy, IconMedal, IconCalendar, IconArrowLeft } from '@tabler/icons-react';
 import BottomNav from '@/Components/BottomNav';
+import Pagination from '@/Components/Pagination';
 
 export default function PublicList({ auth, prestasis }) {
     return (
@@ -27,8 +28,8 @@ export default function PublicList({ auth, prestasis }) {
 
                 {/* Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {prestasis.length > 0 ? (
-                        prestasis.map((item) => (
+                    {prestasis.data.length > 0 ? (
+                        prestasis.data.map((item) => (
                             <div
                                 key={item.id}
                                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col"
@@ -101,6 +102,11 @@ export default function PublicList({ auth, prestasis }) {
                             <p className="text-lg">Belum ada data prestasi yang ditampilkan.</p>
                         </div>
                     )}
+                </div>
+
+                {/* Pagination */}
+                <div className="mt-8">
+                    <Pagination links={prestasis.links} />
                 </div>
             </div>
 
