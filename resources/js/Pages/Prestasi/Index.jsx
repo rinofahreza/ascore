@@ -9,12 +9,21 @@ import BottomNav from '@/Components/BottomNav';
 export default function Index({ auth, prestasis, filters }) {
     const [search, setSearch] = useState(filters.search || '');
 
+    const hasPermission = (permission) => {
+        return auth.user?.role === 'Admin' || (auth.permissions && auth.permissions.includes(permission));
+    };
+
+    const canCreate = hasPermission('prestasi.create');
+    const canEdit = hasPermission('prestasi.edit');
+    const canDelete = hasPermission('prestasi.delete');
+
     const handleSearch = (e) => {
         e.preventDefault();
         router.get(route('prestasi.index'), { search }, { preserveState: true });
     };
 
     const handleDelete = (id) => {
+        if (!canDelete) return;
         Swal.fire({
             title: 'Apakah anda yakin?',
             text: "Data yang dihapus tidak dapat dikembalikan!",
@@ -40,6 +49,7 @@ export default function Index({ auth, prestasis, filters }) {
     };
 
     const toggleStatus = (id, currentStatus) => {
+        if (!canEdit) return;
         router.post(route('prestasi.toggle-status', id), {}, {
             preserveScroll: true,
             onSuccess: () => {
@@ -71,13 +81,15 @@ export default function Index({ auth, prestasis, filters }) {
                         <div className="p-6">
                             {/* Header Actions */}
                             <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-                                <Link
-                                    href={route('prestasi.create')}
-                                    className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                                >
-                                    <IconPlus size={16} className="mr-2" />
-                                    Tambah Prestasi
-                                </Link>
+                                {canCreate ? (
+                                    <Link
+                                        href={route('prestasi.create')}
+                                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                    >
+                                        <IconPlus size={16} className="mr-2" />
+                                        Tambah Prestasi
+                                    </Link>
+                                ) : <div></div>}
 
                                 <form onSubmit={handleSearch} className="flex gap-2">
                                     <div className="relative">
@@ -109,7 +121,9 @@ export default function Index({ auth, prestasis, filters }) {
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Prestasi</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Penghargaan</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
+                                            {(canEdit || canDelete) && (
+                                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
+                                            )}
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -148,33 +162,41 @@ export default function Index({ auth, prestasis, filters }) {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <button
+                                                            disabled={!canEdit}
                                                             onClick={() => toggleStatus(item.id, item.is_active)}
                                                             className={`px-2 py-1 text-xs font-semibold rounded-full ${item.is_active
                                                                 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                                                                 : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                                                                }`}
+                                                                } ${!canEdit ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                         >
                                                             {item.is_active ? 'Aktif' : 'Nonaktif'}
                                                         </button>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                        <div className="flex justify-end gap-2">
-                                                            <Link
-                                                                href={route('prestasi.edit', item.id)}
-                                                                className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
-                                                            >
-                                                                <IconPencil size={18} />
-                                                            </Link>
-                                                            <button
-                                                                onClick={() => handleDelete(item.id)}
-                                                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                                                            >
-                                                                <IconTrash size={18} />
-                                                            </button>
-                                                        </div>
-                                                    </td>
+                                                    {(canEdit || canDelete) && (
+                                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                            <div className="flex justify-end gap-2">
+                                                                {canEdit && (
+                                                                    <Link
+                                                                        href={route('prestasi.edit', item.id)}
+                                                                        className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
+                                                                    >
+                                                                        <IconPencil size={18} />
+                                                                    </Link>
+                                                                )}
+                                                                {canDelete && (
+                                                                    <button
+                                                                        onClick={() => handleDelete(item.id)}
+                                                                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                                                    >
+                                                                        <IconTrash size={18} />
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                    )}
                                                 </tr>
                                             ))
+
                                         ) : (
                                             <tr>
                                                 <td colSpan="6" className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">

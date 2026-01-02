@@ -12,6 +12,14 @@ class PrestasiController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function __construct()
+    {
+        $this->middleware('can:prestasi.view')->only(['index']);
+        $this->middleware('can:prestasi.create')->only(['create', 'store']);
+        $this->middleware('can:prestasi.edit')->only(['edit', 'update', 'toggleStatus']);
+        $this->middleware('can:prestasi.delete')->only(['destroy']);
+    }
+
     public function index(Request $request)
     {
         $query = Prestasi::query();
