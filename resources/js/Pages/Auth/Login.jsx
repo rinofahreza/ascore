@@ -4,6 +4,7 @@ import InputError from '@/Components/InputError';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { IconEye, IconEyeOff } from '@tabler/icons-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import Swal from 'sweetalert2';
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -22,7 +23,20 @@ export default function Login({ status, canResetPassword }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('login'));
+        post(route('login'), {
+            onError: () => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Waduh!',
+                    text: 'Email atau Password salah. Coba cek lagi ya!',
+                    confirmButtonColor: '#f97316',
+                    confirmButtonText: 'Oke, Paham',
+                    background: '#ffffff',
+                    color: '#333',
+                    borderRadius: '20px'
+                });
+            }
+        });
     };
 
     return (
