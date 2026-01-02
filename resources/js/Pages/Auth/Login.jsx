@@ -52,7 +52,7 @@ export default function Login({ status, canResetPassword }) {
                 {/* Logo Area */}
                 <div className="relative z-10 flex flex-col items-center">
                     <div className="bg-white/20 p-4 rounded-3xl backdrop-blur-sm shadow-inner">
-                        <ApplicationLogo className="w-16 h-16 text-white fill-current" />
+                        <img src="/images/logo_white.png" alt="Logo" className="w-16 h-16 object-contain" />
                     </div>
                 </div>
 
