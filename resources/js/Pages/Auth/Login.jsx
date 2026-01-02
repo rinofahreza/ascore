@@ -3,6 +3,7 @@ import Checkbox from '@/Components/Checkbox';
 import InputError from '@/Components/InputError';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { IconEye, IconEyeOff } from '@tabler/icons-react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -25,120 +26,112 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <div className="min-h-screen bg-white dark:bg-gray-900 overflow-hidden relative font-sans text-gray-900 dark:text-gray-100 flex flex-col items-center justify-center p-6">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 flex flex-col items-center">
             <Head title="Log in" />
 
-            {/* Gradient Bubbles Background */}
-            <div className="absolute top-[-10%] left-[-10%] w-[80vw] h-[80vw] sm:w-[500px] sm:h-[500px] rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-orange-400 opacity-90 blur-xl pointer-events-none z-0 transform -translate-x-1/4 -translate-y-1/4"></div>
-            <div className="absolute top-[10%] left-[20%] w-[100px] h-[100px] rounded-full bg-gradient-to-br from-orange-400 to-pink-500 blur-md pointer-events-none z-0 shadow-lg"></div>
+            {/* Header with Wave Background */}
+            <div className="relative w-full h-[35vh] bg-gradient-to-r from-orange-300 to-pink-500 rounded-b-[40px] shadow-lg flex items-center justify-center overflow-hidden">
+                {/* Decorative Circles in Header */}
+                <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white opacity-10 rounded-full blur-2xl pointer-events-none"></div>
+                <div className="absolute bottom-[-10%] left-[-10%] w-48 h-48 bg-yellow-300 opacity-20 rounded-full blur-xl pointer-events-none"></div>
 
-            {/* Main Content Container */}
-            <div className="relative z-10 w-full max-w-sm">
+                {/* Logo Area */}
+                <div className="relative z-10 flex flex-col items-center">
+                    <div className="bg-white/20 p-4 rounded-3xl backdrop-blur-sm shadow-inner">
+                        <ApplicationLogo className="w-16 h-16 text-white fill-current" />
+                    </div>
+                </div>
 
-                {/* Header Typography */}
-                <div className="mb-12">
-                    <h1 className="text-4xl font-extrabold text-purple-800 dark:text-purple-400 tracking-tight leading-none">
-                        LOG IN
+                {/* Wave Shape at bottom - using simpler CSS border radius approach for this specific design looks cleaner, but let's add a subtle SVG wave at the very bottom edge for detail if needed. The reference uses a smooth curve which rounded-b-[40px] achieves well. */}
+            </div>
+
+            {/* Main Content */}
+            <div className="w-full max-w-sm px-6 -mt-0 relative z-10 flex-1 flex flex-col justify-center">
+
+                <div className="text-center mb-8 mt-8">
+                    <h1 className="text-4xl font-bold text-gray-800 dark:text-white tracking-tight">
+                        Hello
                     </h1>
-                    <h2 className="text-xl font-light text-white/90 dark:text-gray-300 tracking-[0.2em] mt-1 relative">
-                        <span className="relative z-10 text-white mix-blend-overlay">TO CONTINUE</span>
-                        {/* Overlay text for readability against white parts if needed, though bubble covers it mostly */}
-                        <span className="absolute left-0 top-0 text-gray-400 -z-10 dark:text-gray-500">TO CONTINUE</span>
-                    </h2>
+                    <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg">
+                        Sign In to your account
+                    </p>
                 </div>
 
                 {status && (
-                    <div className="mb-6 text-sm font-medium text-green-600 p-3 bg-green-50 rounded-lg border border-green-100">
+                    <div className="mb-6 text-sm font-medium text-green-600 text-center bg-green-50 p-3 rounded-xl border border-green-100">
                         {status}
                     </div>
                 )}
 
-                <form onSubmit={submit} className="space-y-8">
-                    {/* Username/Email Input - Material Underline Style */}
-                    <div className="group relative">
+                <form onSubmit={submit} className="space-y-6">
+                    {/* Email Input - White Pill */}
+                    <div className="relative shadow-sm rounded-full bg-white dark:bg-gray-800 transition-shadow hover:shadow-md">
                         <input
                             id="email"
                             type="email"
                             name="email"
                             value={data.email}
-                            className="block w-full px-0 py-2 text-gray-900 dark:text-white bg-transparent border-0 border-b-2 border-purple-200 focus:border-purple-600 dark:border-gray-700 dark:focus:border-purple-500 focus:ring-0 appearance-none transition-colors peer placeholder-transparent"
+                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-700 placeholder-gray-400 text-sm"
                             autoComplete="username"
-                            placeholder="Username"
+                            placeholder="john@email.com"
                             onChange={(e) => setData('email', e.target.value)}
                         />
-                        <label
-                            htmlFor="email"
-                            className="absolute duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-purple-600 peer-focus:dark:text-purple-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 text-gray-500 dark:text-gray-400 font-medium"
-                        >
-                            Username
-                        </label>
-                        <InputError message={errors.email} className="mt-2 text-xs" />
+                        <InputError message={errors.email} className="absolute -bottom-5 left-6 text-xs" />
                     </div>
 
-                    {/* Password Input - Material Underline Style */}
-                    <div className="group relative">
-                        <div className="relative">
-                            <input
-                                id="password"
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                value={data.password}
-                                className="block w-full px-0 py-2 text-gray-900 dark:text-white bg-transparent border-0 border-b-2 border-purple-200 focus:border-purple-600 dark:border-gray-700 dark:focus:border-purple-500 focus:ring-0 appearance-none transition-colors peer placeholder-transparent pr-8"
-                                autoComplete="current-password"
-                                placeholder="Password"
-                                onChange={(e) => setData('password', e.target.value)}
-                            />
-                            <label
-                                htmlFor="password"
-                                className="absolute duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-purple-600 peer-focus:dark:text-purple-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 text-gray-500 dark:text-gray-400 font-medium"
-                            >
-                                Password
-                            </label>
+                    {/* Password Input - White Pill */}
+                    <div className="relative shadow-sm rounded-full bg-white dark:bg-gray-800 transition-shadow hover:shadow-md mt-2">
+                        <input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            value={data.password}
+                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-700 placeholder-gray-400 text-sm pr-12"
+                            autoComplete="current-password"
+                            placeholder="Password"
+                            onChange={(e) => setData('password', e.target.value)}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-pink-500 transition-colors"
+                        >
+                            {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+                        </button>
+                        <InputError message={errors.password} className="absolute -bottom-5 left-6 text-xs" />
+                    </div>
 
-                            {/* Toggle Password Eye - Minimalist */}
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-0 top-2 text-gray-400 hover:text-purple-600 transition-colors"
+                    {/* Forgot Password */}
+                    <div className="flex justify-end pt-1">
+                        {canResetPassword && (
+                            <Link
+                                href={route('password.request')}
+                                className="text-xs text-gray-400 hover:text-pink-500 transition-colors"
                             >
-                                {showPassword ? <IconEyeOff size={18} /> : <IconEye size={18} />}
-                            </button>
-                        </div>
-
-                        <div className="flex justify-between items-start mt-2">
-                            <InputError message={errors.password} className="text-xs" />
-                            {canResetPassword && (
-                                <Link
-                                    href={route('password.request')}
-                                    className="text-xs italic text-gray-400 hover:text-purple-600 transition-colors ml-auto"
-                                >
-                                    Forgot it?
-                                </Link>
-                            )}
-                        </div>
+                                Forgot your Password?
+                            </Link>
+                        )}
                     </div>
 
                     {/* Submit Button - Gradient Pill */}
-                    <div className="pt-8 flex justify-center">
-                        <button
-                            disabled={processing}
-                            className="w-full max-w-[200px] bg-gradient-to-r from-purple-500 to-orange-400 hover:from-purple-600 hover:to-orange-500 text-white font-bold text-sm uppercase tracking-wider py-4 rounded-full shadow-lg shadow-purple-500/30 transform transition-all active:scale-95 disabled:opacity-75 disabled:cursor-not-allowed"
-                        >
-                            {processing ? 'LOGGING IN...' : 'LOG IN'}
-                        </button>
+                    <button
+                        disabled={processing}
+                        className="w-full bg-gradient-to-r from-orange-300 to-pink-500 hover:from-orange-400 hover:to-pink-600 text-white font-bold text-sm uppercase tracking-wider py-4 rounded-full shadow-lg shadow-pink-500/20 transform transition-all active:scale-95 disabled:opacity-75 mt-4"
+                    >
+                        {processing ? 'SIGNING IN...' : 'SIGN IN'}
+                    </button>
+
+                    {/* Create Account Link */}
+                    <div className="text-center mt-8 pb-8">
+                        <p className="text-xs text-gray-400">
+                            Don't have an account? <span className="font-bold text-gray-800 dark:text-gray-200 cursor-pointer hover:text-pink-500 transition-colors">Create</span>
+                        </p>
                     </div>
 
-                    {/* Remember Me - Hidden in this strict design but functionality retained if needed invisibly or add back small */}
-                    {/* 
-                     <div className="flex items-center mt-4">
-                        <Checkbox 
-                            name="remember" 
-                            checked={data.remember} 
-                            onChange={(e) => setData('remember', e.target.checked)} 
-                        />
-                        <span className="ml-2 text-sm text-gray-600">Remember me</span>
-                     </div>
-                     */}
+                    {/* Hidden Remember Me for functionality */}
+                    <div className="sr-only">
+                        <Checkbox name="remember" checked={data.remember} onChange={(e) => setData('remember', e.target.checked)} />
+                    </div>
                 </form>
             </div>
         </div>
