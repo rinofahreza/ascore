@@ -2,6 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Disable tap highlight and long-press context menu (iOS/Android Native Feel) */
+* {
+    -webkit-tap-highlight-color: transparent;
+    /* Android click highlight */
+    -webkit-touch-callout: none;
+    /* iOS Long Press Menu */
+    -webkit-user-select: none;
+    /* Safari Select */
+    user-select: none;
+    /* Standard Select */
+}
+
+/* Re-enable selection for inputs so users can type and edit text */
+input,
+textarea,
+[contenteditable="true"] {
+    -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    user-select: text;
+    cursor: auto;
+}
+
+/* Re-enable selection for specific selectable areas if needed */
+.selectable {
+    -webkit-user-select: text;
+    user-select: text;
+    cursor: text;
+}
+
 @layer base {
     :root {
         --color-primary: #14b8a6;
