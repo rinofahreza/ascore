@@ -44,10 +44,10 @@ export default function Login({ status, canResetPassword }) {
             <Head title="Log in" />
 
             {/* Header with Wave Background */}
-            <div className="relative w-full h-[35vh] bg-gradient-to-r from-orange-300 to-pink-500 rounded-b-[40px] shadow-lg flex items-center justify-center overflow-hidden">
+            <div className="relative w-full h-[35vh] bg-gradient-to-r from-teal-400 to-teal-600 rounded-b-[40px] shadow-lg flex items-center justify-center overflow-hidden">
                 {/* Decorative Circles in Header */}
                 <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white opacity-10 rounded-full blur-2xl pointer-events-none"></div>
-                <div className="absolute bottom-[-10%] left-[-10%] w-48 h-48 bg-yellow-300 opacity-20 rounded-full blur-xl pointer-events-none"></div>
+                <div className="absolute bottom-[-10%] left-[-10%] w-48 h-48 bg-teal-200 opacity-20 rounded-full blur-xl pointer-events-none"></div>
 
                 {/* Logo Area */}
                 <div className="relative z-10 flex flex-col items-center">
@@ -85,7 +85,7 @@ export default function Login({ status, canResetPassword }) {
                             type="email"
                             name="email"
                             value={data.email}
-                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-700 placeholder-gray-400 text-base"
+                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-teal-300 dark:focus:ring-teal-700 placeholder-gray-400 text-base"
                             autoComplete="username"
                             placeholder="nama@asshofa.sch.id"
                             onChange={(e) => setData('email', e.target.value)}
@@ -100,7 +100,7 @@ export default function Login({ status, canResetPassword }) {
                             type={showPassword ? "text" : "password"}
                             name="password"
                             value={data.password}
-                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-700 placeholder-gray-400 text-base pr-12"
+                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-teal-300 dark:focus:ring-teal-700 placeholder-gray-400 text-base pr-12"
                             autoComplete="current-password"
                             placeholder="Password"
                             onChange={(e) => setData('password', e.target.value)}
@@ -108,7 +108,7 @@ export default function Login({ status, canResetPassword }) {
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-pink-500 transition-colors"
+                            className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-teal-500 transition-colors"
                         >
                             {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
                         </button>
@@ -120,10 +120,11 @@ export default function Login({ status, canResetPassword }) {
                     {/* Submit Button - Gradient Pill */}
                     <button
                         disabled={processing}
-                        className="w-full bg-gradient-to-r from-orange-300 to-pink-500 hover:from-orange-400 hover:to-pink-600 text-white font-bold text-sm uppercase tracking-wider py-4 rounded-full shadow-lg shadow-pink-500/20 transform transition-all active:scale-95 disabled:opacity-75 mt-4"
+                        className="w-full bg-gradient-to-r from-teal-400 to-teal-600 hover:from-teal-500 hover:to-teal-700 text-white font-bold text-sm uppercase tracking-wider py-4 rounded-full shadow-lg shadow-teal-500/20 transform transition-all active:scale-95 disabled:opacity-75 mt-4"
                     >
                         {processing ? 'SIGNING IN...' : 'SIGN IN'}
                     </button>
+
 
                     {/* Hidden Remember Me for functionality */}
                     <div className="sr-only">
