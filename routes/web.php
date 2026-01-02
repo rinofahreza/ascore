@@ -40,7 +40,7 @@ Route::middleware('auth')->group(function () {
             'prestasis' => App\Models\Prestasi::where('is_active', true)
                 ->orderBy('urutan', 'asc')
                 ->orderBy('created_at', 'desc')
-                ->take(3)
+                ->take(4)
                 ->get(),
         ]);
     })->name('home');

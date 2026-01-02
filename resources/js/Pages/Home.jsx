@@ -11,7 +11,7 @@ export default function Home({ auth, siswaCount, guruCount, karyawanCount, slide
         <AuthenticatedLayout user={auth.user}>
             <Head title="Home" />
 
-            <div className="bg-gray-100 dark:bg-gray-900 pb-24 pt-header">
+            <div className="bg-gray-100 dark:bg-gray-900 pb-28 pt-header">
                 <div className="mx-auto">
                     {/* Image Slider */}
                     {/* Image Slider */}
