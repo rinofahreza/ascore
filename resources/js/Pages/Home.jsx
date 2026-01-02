@@ -6,7 +6,7 @@ import AchievementShowcase from '@/Components/AchievementShowcase';
 import BottomNav from '@/Components/BottomNav';
 import { Head } from '@inertiajs/react';
 
-export default function Home({ auth, siswaCount, guruCount, karyawanCount }) {
+export default function Home({ auth, siswaCount, guruCount, karyawanCount, sliders }) {
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Home" />
@@ -14,7 +14,8 @@ export default function Home({ auth, siswaCount, guruCount, karyawanCount }) {
             <div className="bg-gray-100 dark:bg-gray-900 pb-24 pt-header">
                 <div className="mx-auto">
                     {/* Image Slider */}
-                    <ImageSlider />
+                    {/* Image Slider */}
+                    <ImageSlider sliders={sliders} />
 
                     {/* Menu Grid */}
                     <MenuGrid />

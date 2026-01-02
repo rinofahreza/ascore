@@ -1,36 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function ImageSlider() {
+export default function ImageSlider({ sliders = [] }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const timeoutRef = useRef(null);
 
-    const slides = [
-        {
-            image: '/images/slider/slider_image_1_1766334301911.png',
-            title: 'Lingkungan Belajar yang Asri',
-            description: 'Suasana belajar yang nyaman dengan taman hijau'
-        },
-        {
-            image: '/images/slider/slider_image_2_1766334341504.png',
-            title: 'Fasilitas Modern',
-            description: 'Ruang kelas dilengkapi teknologi terkini'
-        },
-        {
-            image: '/images/slider/slider_image_3_1766334368480.png',
-            title: 'Masjid yang Megah',
-            description: 'Tempat ibadah yang indah dan nyaman'
-        },
-        {
-            image: '/images/slider/slider_image_4_1766334393950.png',
-            title: 'Aktivitas Olahraga',
-            description: 'Fasilitas olahraga lengkap untuk siswa'
-        },
-        {
-            image: '/images/slider/slider_image_5_1766334420330.png',
-            title: 'Perpustakaan Modern',
-            description: 'Koleksi buku lengkap untuk menunjang pembelajaran'
-        }
-    ];
+    // Use passed sliders or fallbacks if empty (optional, but better to show nothing or default?)
+    // User requested dynamic, so we rely on DB. 
+    // But we need to map DB fields to component fields if they differ.
+    // DB: judul, gambar. Component: title, image.
+    const slides = sliders.length > 0 ? sliders.map(s => ({
+        id: s.id,
+        image: `/storage/${s.gambar}`,
+        title: s.judul || '',
+        description: '' // DB doesn't have description yet
+    })) : [];
+
+    // If no slides, return null or empty div to avoid errors
+    if (slides.length === 0) return null;
 
     const resetTimeout = () => {
         if (timeoutRef.current) {

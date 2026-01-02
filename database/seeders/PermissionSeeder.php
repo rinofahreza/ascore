@@ -23,6 +23,7 @@ class PermissionSeeder extends Seeder
             'Aplikasi' => [
                 'role' => 'Role Manajemen',
                 'user' => 'Pengguna',
+                'slider' => 'Slider Gambar',
             ],
             'Sekolah - Kurikulum' => [
                 'mata_pelajaran' => 'Mata Pelajaran',
@@ -33,6 +34,7 @@ class PermissionSeeder extends Seeder
                 'jadwal_pelajaran' => 'Jadwal Pelajaran',
                 'kalender' => 'Kalender Akademik',
             ],
+
             'Sekolah - Kesiswaan' => [
                 'kelas' => 'Kelas',
                 'guru' => 'Guru',

@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
             'karyawanCount' => App\Models\User::whereHas('role', function ($q) {
                 $q->where('nama', 'Karyawan');
             })->where('is_active', 1)->count(),
+            'sliders' => App\Models\Slider::where('status', true)->orderBy('urutan')->get(),
         ]);
     })->name('home');
 
@@ -78,6 +79,7 @@ Route::middleware('auth')->group(function () {
 
     // Role Routes
     Route::resource('settings/roles', App\Http\Controllers\RoleController::class)->names('settings.roles')->except(['show']);
+    Route::resource('settings/sliders', App\Http\Controllers\SliderController::class)->names('settings.sliders')->except(['show']);
 
     // Pengguna Routes
     Route::resource('pengguna', App\Http\Controllers\PenggunaController::class)->except(['show']);
