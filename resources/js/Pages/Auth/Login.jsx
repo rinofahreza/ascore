@@ -46,7 +46,7 @@ export default function Login({ status, canResetPassword }) {
             </div>
 
             {/* Main Content */}
-            <div className="w-full max-w-sm px-6 -mt-8 relative z-10 flex-1 flex flex-col justify-start">
+            <div className="w-full max-w-sm px-6 mt-4 relative z-10 flex-1 flex flex-col justify-start">
 
                 <div className="text-center mb-8 mt-8">
                     <h1 className="text-4xl font-bold text-gray-800 dark:text-white tracking-tight">
