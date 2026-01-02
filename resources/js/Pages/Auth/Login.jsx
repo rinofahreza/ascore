@@ -101,17 +101,7 @@ export default function Login({ status, canResetPassword }) {
                         <InputError message={errors.password} className="absolute -bottom-5 left-6 text-xs" />
                     </div>
 
-                    {/* Forgot Password */}
-                    <div className="flex justify-end pt-1">
-                        {canResetPassword && (
-                            <Link
-                                href={route('password.request')}
-                                className="text-xs text-gray-400 hover:text-pink-500 transition-colors"
-                            >
-                                Forgot your Password?
-                            </Link>
-                        )}
-                    </div>
+
 
                     {/* Submit Button - Gradient Pill */}
                     <button
