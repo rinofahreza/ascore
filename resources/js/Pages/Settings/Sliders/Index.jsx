@@ -99,7 +99,7 @@ export default function Index({ auth, sliders }) {
         <AuthenticatedLayout user={auth.user} forceMenu={true}>
             <Head title="Slider Gambar" />
 
-            <div className="py-12">
+            <div className="pt-12 pb-28">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
