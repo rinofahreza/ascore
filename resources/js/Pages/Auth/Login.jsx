@@ -40,93 +40,82 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 flex flex-col items-center">
+        <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-6">
             <Head title="Log in" />
 
-            {/* Header with Wave Background */}
-            <div className="relative w-full h-[35vh] bg-gradient-to-r from-teal-400 to-teal-600 rounded-b-[40px] shadow-lg flex items-center justify-center overflow-hidden">
-                {/* Decorative Circles in Header */}
-                <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white opacity-10 rounded-full blur-2xl pointer-events-none"></div>
-                <div className="absolute bottom-[-10%] left-[-10%] w-48 h-48 bg-teal-200 opacity-20 rounded-full blur-xl pointer-events-none"></div>
-
-                {/* Logo Area */}
-                <div className="relative z-10 flex flex-col items-center">
-                    <div className="bg-white/20 p-4 rounded-3xl backdrop-blur-sm shadow-inner">
-                        <img src="/images/logo_white.png" alt="Logo" className="w-16 h-16 object-contain" />
-                    </div>
+            <div className="w-full max-w-sm flex flex-col items-center">
+                {/* Illustration */}
+                <div className="w-full max-w-[300px] mb-8">
+                    <img
+                        src="/images/login-illustration.png"
+                        alt="Login Illustration"
+                        className="w-full h-auto object-contain"
+                    />
                 </div>
 
-                {/* Wave Shape at bottom - using simpler CSS border radius approach for this specific design looks cleaner, but let's add a subtle SVG wave at the very bottom edge for detail if needed. The reference uses a smooth curve which rounded-b-[40px] achieves well. */}
-            </div>
+                {/* Title */}
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    Log in to continue to the ASCORE
+                </h1>
 
-            {/* Main Content */}
-            <div className="w-full max-w-sm px-6 mt-4 relative z-10 flex-1 flex flex-col justify-start">
-
-                <div className="text-center mb-8 mt-8">
-                    <h1 className="text-4xl font-bold text-gray-800 dark:text-white tracking-tight">
-                        Hello
-                    </h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg">
-                        Sign In to your account
-                    </p>
-                </div>
-
+                {/* Status Message */}
                 {status && (
-                    <div className="mb-6 text-sm font-medium text-green-600 text-center bg-green-50 p-3 rounded-xl border border-green-100">
+                    <div className="mb-6 w-full text-sm font-medium text-green-600 text-center bg-green-50 p-3 rounded-lg border border-green-100">
                         {status}
                     </div>
                 )}
 
-                <form onSubmit={submit} className="space-y-6">
-                    {/* Email Input - White Pill */}
-                    <div className="relative shadow-sm rounded-full bg-white dark:bg-gray-800 transition-shadow hover:shadow-md">
+                {/* Form */}
+                <form onSubmit={submit} className="w-full max-w-xs space-y-5">
+                    {/* Email Input */}
+                    <div className="relative group">
                         <input
                             id="email"
                             type="email"
                             name="email"
                             value={data.email}
-                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-teal-300 dark:focus:ring-teal-700 placeholder-gray-400 text-base"
+                            onChange={(e) => setData('email', e.target.value)}
+                            className="w-full px-4 py-3.5 rounded-lg border border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:bg-gray-800 dark:text-white transition-all outline-none placeholder-gray-400 text-sm"
                             autoComplete="username"
                             placeholder="nama@asshofa.sch.id"
-                            onChange={(e) => setData('email', e.target.value)}
                         />
-                        <InputError message={errors.email} className="absolute -bottom-5 left-6 text-xs" />
+                        <InputError message={errors.email} className="mt-1" />
                     </div>
 
-                    {/* Password Input - White Pill */}
-                    <div className="relative shadow-sm rounded-full bg-white dark:bg-gray-800 transition-shadow hover:shadow-md mt-2">
+                    {/* Password Input */}
+                    <div className="relative">
                         <input
                             id="password"
                             type={showPassword ? "text" : "password"}
                             name="password"
                             value={data.password}
-                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-teal-300 dark:focus:ring-teal-700 placeholder-gray-400 text-base pr-12"
+                            onChange={(e) => setData('password', e.target.value)}
+                            className="w-full px-4 py-3.5 rounded-lg border border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:bg-gray-800 dark:text-white transition-all outline-none placeholder-gray-400 text-sm pr-12"
                             autoComplete="current-password"
                             placeholder="Password"
-                            onChange={(e) => setData('password', e.target.value)}
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-teal-500 transition-colors"
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
                         >
-                            {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+                            {showPassword ? <IconEye size={20} /> : <IconEyeOff size={20} />}
                         </button>
-                        <InputError message={errors.password} className="absolute -bottom-5 left-6 text-xs" />
+                        <InputError message={errors.password} className="mt-1" />
                     </div>
 
+                    {/* Submit Button */}
+                    <div className="pt-4">
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="w-full bg-[#1a73e8] hover:bg-blue-700 text-white font-semibold py-3.5 rounded-lg shadow-md hover:shadow-lg transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed text-sm tracking-wide"
+                        >
+                            {processing ? 'Logging in...' : 'Log in'}
+                        </button>
+                    </div>
 
-
-                    {/* Submit Button - Gradient Pill */}
-                    <button
-                        disabled={processing}
-                        className="w-full bg-gradient-to-r from-teal-400 to-teal-600 hover:from-teal-500 hover:to-teal-700 text-white font-bold text-sm uppercase tracking-wider py-4 rounded-full shadow-lg shadow-teal-500/20 transform transition-all active:scale-95 disabled:opacity-75 mt-4"
-                    >
-                        {processing ? 'SIGNING IN...' : 'SIGN IN'}
-                    </button>
-
-
-                    {/* Hidden Remember Me for functionality */}
+                    {/* Hidden Remember Me */}
                     <div className="sr-only">
                         <Checkbox name="remember" checked={data.remember} onChange={(e) => setData('remember', e.target.checked)} />
                     </div>
