@@ -8,12 +8,19 @@ export default function OfflineIndicator() {
     }
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 dark:bg-yellow-600 text-white px-4 py-2 text-center font-medium shadow-lg safe-area-top">
-            <div className="flex items-center justify-center space-x-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414" />
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] animate-bounce-in">
+            <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-gray-900/90 dark:bg-black/90 backdrop-blur-md shadow-2xl border border-white/10 text-white">
+                <div className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-sm font-semibold leading-none">Offline Mode</span>
+                </div>
+                <div className="w-px h-4 bg-white/20 mx-1"></div>
+                <svg className="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 1l22 22" /><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" /><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" /><path d="M10.71 5.05A16 16 0 0 1 22.58 9" /><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" /><path d="M8.53 16.11a6 6 0 0 1 6.95 0" /><line x1="12" y1="20" x2="12.01" y2="20" />
                 </svg>
-                <span>Tidak ada koneksi internet - Menampilkan data tersimpan</span>
             </div>
         </div>
     );
