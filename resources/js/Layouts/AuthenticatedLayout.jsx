@@ -27,7 +27,7 @@ export default function AuthenticatedLayout({ header, children, hideNav, forceMe
 
 
     // Determine if we should show back button instead of hamburger
-    const subPages = ['/profile', '/security', '/nilai', '/profile/edit', '/absensi', '/jadwal', '/berkas', '/jurnal', '/settings', '/kalender-akademik', '/notifikasi', '/achievements', '/kesehatan', '/laporan'];
+    const subPages = ['/profile', '/security', '/nilai', '/profile/edit', '/absensi', '/jadwal', '/berkas', '/jurnal', '/settings', '/kalender-akademik', '/notifikasi', '/achievements', '/kesehatan', '/laporan', '/prestasi/list'];
     const isSubPage = !forceMenu && subPages.some(page => url.startsWith(page));
 
     // Permission Helper
