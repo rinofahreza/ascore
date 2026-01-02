@@ -71,7 +71,7 @@ export default function Login({ status, canResetPassword }) {
                             type="email"
                             name="email"
                             value={data.email}
-                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-700 placeholder-gray-400 text-sm"
+                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-700 placeholder-gray-400 text-base"
                             autoComplete="username"
                             placeholder="john@email.com"
                             onChange={(e) => setData('email', e.target.value)}
@@ -86,7 +86,7 @@ export default function Login({ status, canResetPassword }) {
                             type={showPassword ? "text" : "password"}
                             name="password"
                             value={data.password}
-                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-700 placeholder-gray-400 text-sm pr-12"
+                            className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-700 placeholder-gray-400 text-base pr-12"
                             autoComplete="current-password"
                             placeholder="Password"
                             onChange={(e) => setData('password', e.target.value)}
