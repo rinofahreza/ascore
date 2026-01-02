@@ -73,7 +73,7 @@ export default function Login({ status, canResetPassword }) {
                             value={data.email}
                             className="block w-full px-6 py-4 text-gray-900 dark:text-white bg-transparent border-none rounded-full focus:ring-2 focus:ring-pink-300 dark:focus:ring-pink-700 placeholder-gray-400 text-base"
                             autoComplete="username"
-                            placeholder="john@email.com"
+                            placeholder="nama@asshofa.sch.id"
                             onChange={(e) => setData('email', e.target.value)}
                         />
                         <InputError message={errors.email} className="absolute -bottom-5 left-6 text-xs" />
@@ -120,13 +120,6 @@ export default function Login({ status, canResetPassword }) {
                     >
                         {processing ? 'SIGNING IN...' : 'SIGN IN'}
                     </button>
-
-                    {/* Create Account Link */}
-                    <div className="text-center mt-8 pb-8">
-                        <p className="text-xs text-gray-400">
-                            Don't have an account? <span className="font-bold text-gray-800 dark:text-gray-200 cursor-pointer hover:text-pink-500 transition-colors">Create</span>
-                        </p>
-                    </div>
 
                     {/* Hidden Remember Me for functionality */}
                     <div className="sr-only">
