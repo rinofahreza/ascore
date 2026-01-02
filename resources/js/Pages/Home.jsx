@@ -6,7 +6,7 @@ import AchievementShowcase from '@/Components/AchievementShowcase';
 import BottomNav from '@/Components/BottomNav';
 import { Head } from '@inertiajs/react';
 
-export default function Home({ auth, siswaCount, guruCount, karyawanCount, sliders }) {
+export default function Home({ auth, siswaCount, guruCount, karyawanCount, sliders, prestasis }) {
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Home" />
@@ -28,7 +28,7 @@ export default function Home({ auth, siswaCount, guruCount, karyawanCount, slide
                     />
 
                     {/* Achievement Showcase */}
-                    <AchievementShowcase />
+                    <AchievementShowcase prestasis={prestasis} />
 
 
                 </div>

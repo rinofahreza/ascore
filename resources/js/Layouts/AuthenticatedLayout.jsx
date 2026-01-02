@@ -489,7 +489,7 @@ export default function AuthenticatedLayout({ header, children, hideNav, forceMe
                             )}
 
                             {/* Akademik Dropdown */}
-                            {(hasPermission('periode_akademik.view') || hasPermission('jadwal_pelajaran.view') || hasPermission('kalender.view')) && (
+                            {(hasPermission('periode_akademik.view') || hasPermission('jadwal_pelajaran.view') || hasPermission('kalender.view') || hasPermission('prestasi.view')) && (
                                 <div>
                                     <button
                                         onClick={() => setIsAkademikOpen(!isAkademikOpen)}
@@ -574,6 +574,18 @@ export default function AuthenticatedLayout({ header, children, hideNav, forceMe
                                                     </div>
                                                 </ResponsiveNavLink>
                                             )}
+
+                                            <ResponsiveNavLink themeColor={currentColor}
+                                                href={route('prestasi.index')}
+                                                active={route().current('prestasi.*')}
+                                            >
+                                                <div className="flex items-center space-x-3">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                                    </svg>
+                                                    <span>Prestasi GuKar</span>
+                                                </div>
+                                            </ResponsiveNavLink>
 
                                         </div>
                                     )}

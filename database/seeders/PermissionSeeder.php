@@ -33,6 +33,7 @@ class PermissionSeeder extends Seeder
                 'periode_akademik' => 'Periode Akademik',
                 'jadwal_pelajaran' => 'Jadwal Pelajaran',
                 'kalender' => 'Kalender Akademik',
+                'prestasi' => 'Prestasi GuKar',
             ],
 
             'Sekolah - Kesiswaan' => [

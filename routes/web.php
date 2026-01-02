@@ -37,6 +37,11 @@ Route::middleware('auth')->group(function () {
                 $q->where('nama', 'Karyawan');
             })->where('is_active', 1)->count(),
             'sliders' => App\Models\Slider::where('status', true)->orderBy('urutan')->get(),
+            'prestasis' => App\Models\Prestasi::where('is_active', true)
+                ->orderBy('urutan', 'asc')
+                ->orderBy('created_at', 'desc')
+                ->take(3)
+                ->get(),
         ]);
     })->name('home');
 
@@ -137,6 +142,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('jadwal-pelajaran', App\Http\Controllers\JadwalPelajaranController::class)->except(['show']);
     Route::post('jadwal-pelajaran/batch-save', [App\Http\Controllers\JadwalPelajaranController::class, 'batchSave'])->name('jadwal-pelajaran.batch-save');
 
+    // Prestasi Routes
+    Route::resource('prestasi', App\Http\Controllers\PrestasiController::class)->except(['show']);
+    Route::post('prestasi/{id}/toggle-status', [App\Http\Controllers\PrestasiController::class, 'toggleStatus'])->name('prestasi.toggle-status');
+
     // API Routes
     Route::get('api/departemen/by-cabang/{cabang_id}', [App\Http\Controllers\JamPelajaranController::class, 'getDepartemenByCabang'])->name('api.jam-pelajaran.departemen.by-cabang');
     Route::get('api/kelas/by-departemen/{departemen_id}', [App\Http\Controllers\JadwalPelajaranController::class, 'getKelasByDepartemen'])->name('api.kelas.by-departemen');
@@ -203,4 +212,5 @@ require __DIR__ . '/auth.php';
 Route::get('/achievements', function () {
     return Inertia::render('Achievements/Index');
 })->name('achievements.index');
+Route::get('/prestasi/list', [App\Http\Controllers\PrestasiController::class, 'publicIndex'])->name('prestasi.public-index');
 Route::resource('kalender-akademik', App\Http\Controllers\KalenderAkademikController::class)->except(['show']);
