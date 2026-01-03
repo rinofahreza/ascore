@@ -5,6 +5,7 @@ namespace App\Services;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
+use Kreait\Firebase\Messaging\WebPushConfig;
 
 class FCMService
 {
@@ -43,18 +44,20 @@ class FCMService
         }
 
         try {
-            // WE SEND DATA-ONLY MESSAGE to prevent duplicate notifications.
-            // The Service Worker (public/firebase-messaging-sw.js) will handle the display.
+            // Prepare Notification object
+            $notification = Notification::create($title, $body, $image);
 
-            // Merge title/body into data so SW can read it
-            $dataPayload = array_merge($data, [
-                'title' => $title,
-                'body' => $body,
-                'icon' => $image ?? '/logo.png'
+            // Add WebPush Config for Click Action
+            $webPush = WebPushConfig::fromArray([
+                'fcm_options' => [
+                    'link' => $data['url'] ?? env('APP_URL'),
+                ],
             ]);
 
             $message = CloudMessage::withTarget('token', $token)
-                ->withData($dataPayload); // No ->withNotification()
+                ->withNotification($notification)
+                ->withWebPushConfig($webPush)
+                ->withData($data);
 
             $result = $this->messaging->send($message);
             \Log::info("FCM Sent to $token: " . json_encode($result));

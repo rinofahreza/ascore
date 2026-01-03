@@ -20,12 +20,12 @@ messaging.onBackgroundMessage(function (payload) {
     // We only need to manually show notification if we are sending "Data Messages" (without 'notification' key).
 
     // Check if it's a data-only message before showing notification manually
-    if (payload.data && !payload.notification) {
-        const notificationTitle = payload.data.title || 'New Notification';
-        const notificationOptions = {
-            body: payload.data.body,
-            icon: '/logo.png'
-        };
-        self.registration.showNotification(notificationTitle, notificationOptions);
-    }
+    // if (payload.data && !payload.notification) {
+    //     const notificationTitle = payload.data.title || 'New Notification';
+    //     const notificationOptions = {
+    //         body: payload.data.body,
+    //         icon: '/logo.png'
+    //     };
+    //     self.registration.showNotification(notificationTitle, notificationOptions);
+    // }
 });
