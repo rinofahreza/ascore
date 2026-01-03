@@ -14,11 +14,14 @@ class FCMService
     {
         // Initialize Firebase using the credentials file
         // We assume config('firebase.projects.app.credentials') is set or fallback to env
-        $credentialsPath = base_path(env('FIREBASE_CREDENTIALS', 'firebase-credentials.json'));
+        $envPath = env('FIREBASE_CREDENTIALS', 'firebase-credentials.json');
+        $credentialsPath = base_path($envPath);
 
         if (file_exists($credentialsPath)) {
             $factory = (new Factory)->withServiceAccount($credentialsPath);
             $this->messaging = $factory->createMessaging();
+        } else {
+            \Log::error("FCM Init Error: Credentials not found at $credentialsPath");
         }
     }
 
@@ -35,24 +38,22 @@ class FCMService
     public function sendToToken($token, $title, $body, $data = [], $image = null)
     {
         if (!$this->messaging) {
+            \Log::error("FCM Send Error: Messaging service not initialized.");
             return null;
         }
 
         try {
             // Prepare Notification object
-            // Note: If we include Notification object, the SDK/OS handles display automatically.
-            // If we want FULL manual control in SW, we should send only DATA.
-            // But for standard behavior, sending Notification object is fine and easier.
-
             $notification = Notification::create($title, $body, $image);
 
             $message = CloudMessage::withTarget('token', $token)
                 ->withNotification($notification)
                 ->withData($data);
 
-            return $this->messaging->send($message);
+            $result = $this->messaging->send($message);
+            \Log::info("FCM Sent to $token: " . json_encode($result));
+            return $result;
         } catch (\Throwable $e) {
-            // Log error or just return false
             \Log::error('FCM Send Error: ' . $e->getMessage());
             return false;
         }
