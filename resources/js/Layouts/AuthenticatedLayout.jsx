@@ -25,6 +25,44 @@ export default function AuthenticatedLayout({ header, children, hideNav, forceMe
     const isSubPage = !forceMenu && subPages.some(page => url.startsWith(page));
 
     // Permission Helper
+    const hasPermission = (permission) => {
+        const userRole = props.auth?.role; // Role name from HandleInertiaRequests
+        const userPermissions = props.auth?.permissions || [];
+        return userRole === 'Admin' || userPermissions.includes(permission);
+    };
+
+    // Auto-open parent menus based on current route
+    useEffect(() => {
+        // Auto-open submenus based on current route
+        if (route().current('user.*') || route().current('role.*')) {
+            setIsKontrolAksesOpen(true);
+        }
+        if (route().current('mata-pelajaran.*') || route().current('jam-pelajaran.*')) {
+            setIsKurikulumOpen(true);
+        }
+
+        // Akademik submenu routes
+        if (route().current('periode-akademik.*') || route().current('semester-akademik.*') || route().current('jadwal-pelajaran.*')) {
+            setIsAkademikOpen(true);
+        }
+
+        // Kesiswaan submenu routes
+
+        // Poin submenu routes
+        if (route().current('poin.*') || route().current('pelanggaran.*')) {
+            setIsKesiswaanOpen(true);
+            setIsPoinOpen(true);
+        }
+        if (route().current('kelas.*') || route().current('guru.*') || route().current('siswa.*') || route().current('level.*')) {
+            setIsKesiswaanOpen(true);
+        }
+
+        // Kontrol Akses submenu routes
+        if (route().current('role.*') || route().current('pengguna.*')) {
+            setIsKontrolAksesOpen(true);
+        }
+    }, [url]); // Re-run when URL changes
+
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme') || 'light';
         setTheme(savedTheme);
