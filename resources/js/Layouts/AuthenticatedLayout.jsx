@@ -8,6 +8,8 @@ import AvatarUploadModal from '@/Components/AvatarUploadModal';
 import { useState, useEffect } from 'react';
 import useThemeColor from '@/Hooks/useThemeColor';
 import { Link, usePage } from '@inertiajs/react';
+import { messaging, getToken } from '../firebase';
+import axios from 'axios';
 
 export default function AuthenticatedLayout({ header, children, hideNav, forceMenu = false }) {
     const { currentColor, changeColor, colors } = useThemeColor();
@@ -77,6 +79,36 @@ export default function AuthenticatedLayout({ header, children, hideNav, forceMe
         const savedTheme = localStorage.getItem('theme') || 'light';
         setTheme(savedTheme);
         document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+
+        // Request Notification Permission
+        const requestNotificationPermission = async () => {
+            if ('Notification' in window && messaging) {
+                try {
+                    const permission = await Notification.requestPermission();
+                    if (permission === 'granted') {
+                        // TODO: Replace with your generate Public VAPID Key from Firebase Console -> Project Settings -> Cloud Messaging
+                        // For now we try without key, or user must provide it.
+                        // It is highly recommended to use vapidKey.
+                        const currentToken = await getToken(messaging, {
+                            vapidKey: 'BMQTVMcqQn7J55MnRLb4bOi4pfX4iRv1-WXQ1ULv1qU31IV1OgE60iL13DfqC4NC14qfPe3it-HWe_wXS4RBP7g'
+                        });
+
+                        if (currentToken) {
+                            if (props.auth.user) {
+                                await axios.post(route('fcm.update'), { token: currentToken });
+                                console.log('FCM Token refreshed');
+                            }
+                        } else {
+                            console.log('No registration token available. Request permission to generate one.');
+                        }
+                    }
+                } catch (err) {
+                    console.log('An error occurred while retrieving token. ', err);
+                }
+            }
+        };
+
+        requestNotificationPermission();
     }, []);
 
     const toggleTheme = () => {

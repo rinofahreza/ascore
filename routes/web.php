@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\JurnalController;
 use App\Http\Controllers\JurnalAccessCodeController;
+use App\Http\Controllers\AbsensiController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -56,6 +57,10 @@ Route::middleware('auth')->group(function () {
     // Post Routes
     Route::get('/post', [PostController::class, 'index'])->name('post.index');
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
+    // FCM
+    Route::post('/fcm-token', [App\Http\Controllers\FCMController::class, 'updateToken'])->name('fcm.update');
+
+    Route::post('/absensi', [App\Http\Controllers\AbsensiController::class, 'store'])->name('absensi.store');
     Route::post('/post', [PostController::class, 'store'])->name('post.store');
     Route::post('/post/{post}/like', [PostController::class, 'toggleLike'])->name('post.like');
     Route::post('/post/{post}/comment', [PostController::class, 'addComment'])->name('post.comment');
