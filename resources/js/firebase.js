@@ -24,6 +24,17 @@ try {
 const getFcmToken = async () => {
     if (!messaging) return null;
     try {
+        // ZOMBIE KILLER: Unregister old 'firebase-messaging-sw.js' if found
+        if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (let registration of registrations) {
+                if (registration.active && registration.active.scriptURL.includes('firebase-messaging-sw.js')) {
+                    console.log('Unregistering Zombie SW:', registration.active.scriptURL);
+                    await registration.unregister();
+                }
+            }
+        }
+
         const registration = await navigator.serviceWorker.register('/fcm-sw.js');
         return await getToken(messaging, {
             vapidKey: 'BMQTVMcqQn7J55MnRLb4bOi4pfX4iRv1-WXQ1ULv1qU31IV1OgE60iL13DfqC4NC14qfPe3it-HWe_wXS4RBP7g',
