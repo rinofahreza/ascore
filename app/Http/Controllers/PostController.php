@@ -184,7 +184,10 @@ class PostController extends Controller
     /**
      * Toggle like on a post
      */
-    public function toggleLike(Post $post)
+    /**
+     * Toggle like on a post
+     */
+    public function toggleLike(Post $post, \App\Services\FCMService $fcmService)
     {
         $like = $post->likes()->where('user_id', auth()->id())->first();
 
@@ -216,6 +219,21 @@ class PostController extends Controller
                         'post_content' => substr($post->content, 0, 50),
                     ],
                 ]);
+
+                // Send FCM Notification
+                $targetUser = \App\Models\User::find($post->user_id);
+                if ($targetUser && $targetUser->fcm_token) {
+                    $title = "Ada Like Baru! ❤️";
+                    $body = auth()->user()->name . " menyukai postingan Anda: \"" . substr($post->content, 0, 30) . "...\"";
+
+                    // Add URL to open
+                    $dataPayload = [
+                        'url' => route('post.show', $post->id),
+                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK' // Standard for many handlers
+                    ];
+
+                    $fcmService->sendToToken($targetUser->fcm_token, $title, $body, $dataPayload);
+                }
             }
         }
 
@@ -225,7 +243,7 @@ class PostController extends Controller
     /**
      * Add a comment to a post
      */
-    public function addComment(Request $request, Post $post)
+    public function addComment(Request $request, Post $post, \App\Services\FCMService $fcmService)
     {
         $request->validate([
             'content' => 'required|string|max:1000',
@@ -252,7 +270,7 @@ class PostController extends Controller
 
         $usersToNotify = $usersToNotify->merge($previousCommenters)->unique();
 
-        // Create notifications for all participants
+        // Create notifications for all participants AND Send FCM
         foreach ($usersToNotify as $userId) {
             \App\Models\Notification::create([
                 'user_id' => $userId,
@@ -268,6 +286,19 @@ class PostController extends Controller
                     'comment_id' => $comment->id, // Add comment ID for scrolling
                 ],
             ]);
+
+            // Send FCM
+            $targetUser = \App\Models\User::find($userId);
+            if ($targetUser && $targetUser->fcm_token) {
+                $title = "Komentar Baru 💬";
+                $body = auth()->user()->name . " mengomentari postingan: \"" . substr($request->input('content'), 0, 30) . "...\"";
+
+                $dataPayload = [
+                    'url' => route('post.show', $post->id),
+                ];
+
+                $fcmService->sendToToken($targetUser->fcm_token, $title, $body, $dataPayload);
+            }
         }
 
         return back();
