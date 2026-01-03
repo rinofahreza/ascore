@@ -43,12 +43,18 @@ class FCMService
         }
 
         try {
-            // Prepare Notification object
-            $notification = Notification::create($title, $body, $image);
+            // WE SEND DATA-ONLY MESSAGE to prevent duplicate notifications.
+            // The Service Worker (public/firebase-messaging-sw.js) will handle the display.
+
+            // Merge title/body into data so SW can read it
+            $dataPayload = array_merge($data, [
+                'title' => $title,
+                'body' => $body,
+                'icon' => $image ?? '/logo.png'
+            ]);
 
             $message = CloudMessage::withTarget('token', $token)
-                ->withNotification($notification)
-                ->withData($data);
+                ->withData($dataPayload); // No ->withNotification()
 
             $result = $this->messaging->send($message);
             \Log::info("FCM Sent to $token: " . json_encode($result));
