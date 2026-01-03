@@ -20,6 +20,15 @@ export default function AuthenticatedLayout({ header, children, hideNav, forceMe
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
 
+    const [isKontrolAksesOpen, setIsKontrolAksesOpen] = useState(false);
+    const [isKurikulumOpen, setIsKurikulumOpen] = useState(false);
+    const [isAkademikOpen, setIsAkademikOpen] = useState(false);
+    const [isKesiswaanOpen, setIsKesiswaanOpen] = useState(false);
+    const [isPoinOpen, setIsPoinOpen] = useState(false);
+    const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+    const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+    const [theme, setTheme] = useState('light');
+
     // Determine if we should show back button instead of hamburger
     const subPages = ['/profile', '/security', '/nilai', '/profile/edit', '/absensi', '/jadwal', '/berkas', '/jurnal', '/settings', '/kalender-akademik', '/notifikasi', '/achievements', '/kesehatan', '/laporan', '/prestasi/list'];
     const isSubPage = !forceMenu && subPages.some(page => url.startsWith(page));
