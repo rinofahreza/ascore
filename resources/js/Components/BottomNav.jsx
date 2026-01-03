@@ -113,7 +113,7 @@ export default function BottomNav() {
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className={`flex flex-col items-center justify-center ${item.isCenter ? 'flex-1' : 'flex-1'}`}
+                                className={`flex flex-col items-center justify-center ${item.isCenter ? 'flex-1' : 'flex-1'} active:scale-90 transition-transform duration-150`}
                             >
                                 <div className={`flex flex-col items-center transition-all ${isActive
                                     ? 'scale-110'
