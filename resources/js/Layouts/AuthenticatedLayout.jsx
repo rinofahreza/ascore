@@ -19,9 +19,12 @@ export default function AuthenticatedLayout({ header, children, hideNav, forceMe
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
-    // ...
 
-    // (UseEffect for theme and notification)
+    // Determine if we should show back button instead of hamburger
+    const subPages = ['/profile', '/security', '/nilai', '/profile/edit', '/absensi', '/jadwal', '/berkas', '/jurnal', '/settings', '/kalender-akademik', '/notifikasi', '/achievements', '/kesehatan', '/laporan', '/prestasi/list'];
+    const isSubPage = !forceMenu && subPages.some(page => url.startsWith(page));
+
+    // Permission Helper
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme') || 'light';
         setTheme(savedTheme);
