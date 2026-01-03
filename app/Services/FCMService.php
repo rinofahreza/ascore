@@ -60,7 +60,6 @@ class FCMService
                 ->withData($data);
 
             $result = $this->messaging->send($message);
-            \Log::info("FCM Sent to $token: " . json_encode($result));
             return $result;
         } catch (\Throwable $e) {
             \Log::error('FCM Send Error: ' . $e->getMessage());

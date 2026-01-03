@@ -220,11 +220,8 @@ class PostController extends Controller
 
                 // Send FCM Notification
                 $targetUser = \App\Models\User::find($post->user_id);
-                \Log::info("Like Action: User " . auth()->id() . " liked Post " . $post->id . ". Owner: " . $post->user_id);
 
                 if ($targetUser) {
-                    \Log::info("Target User Found: " . $targetUser->name . " Token: " . ($targetUser->fcm_token ? 'YES' : 'NULL'));
-
                     if ($targetUser->fcm_token) {
                         $title = "Ada Like Baru! ❤️";
                         $body = auth()->user()->name . " menyukai postingan Anda: \"" . substr($post->content, 0, 30) . "...\"";
@@ -236,8 +233,6 @@ class PostController extends Controller
                         ];
 
                         $fcmService->sendToToken($targetUser->fcm_token, $title, $body, $dataPayload);
-                    } else {
-                        \Log::warning("Skipping FCM: No Token for user " . $targetUser->id);
                     }
                 }
             }
@@ -276,7 +271,7 @@ class PostController extends Controller
 
         $usersToNotify = $usersToNotify->merge($previousCommenters)->unique();
 
-        \Log::info("Comment Action: Notify " . $usersToNotify->count() . " users. Post: " . $post->id);
+
 
         // Create notifications for all participants AND Send FCM
         foreach ($usersToNotify as $userId) {
@@ -298,7 +293,6 @@ class PostController extends Controller
             // Send FCM
             $targetUser = \App\Models\User::find($userId);
             if ($targetUser && $targetUser->fcm_token) {
-                \Log::info("Sending Comment Notif to: " . $targetUser->name);
                 $title = "Komentar Baru 💬";
                 $body = auth()->user()->name . " mengomentari postingan: \"" . substr($request->input('content'), 0, 30) . "...\"";
 
@@ -307,8 +301,6 @@ class PostController extends Controller
                 ];
 
                 $fcmService->sendToToken($targetUser->fcm_token, $title, $body, $dataPayload);
-            } else {
-                \Log::warning("Skipping FCM Comment: Token null for user " . $userId);
             }
         }
 
