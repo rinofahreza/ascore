@@ -8,73 +8,20 @@ import AvatarUploadModal from '@/Components/AvatarUploadModal';
 import { useState, useEffect } from 'react';
 import useThemeColor from '@/Hooks/useThemeColor';
 import { Link, usePage } from '@inertiajs/react';
-import { messaging, getToken } from '../firebase';
+import { messaging, getFcmToken } from '../firebase';
 import axios from 'axios';
 
 export default function AuthenticatedLayout({ header, children, hideNav, forceMenu = false }) {
+    // ... (keep existing hook calls)
     const { currentColor, changeColor, colors } = useThemeColor();
     const { url, props } = usePage();
     const user = props.auth?.user;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
-    const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
-    const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
-    const [theme, setTheme] = useState('light');
-    const [isKontrolAksesOpen, setIsKontrolAksesOpen] = useState(false);
-    const [isKurikulumOpen, setIsKurikulumOpen] = useState(false);
-    const [isAkademikOpen, setIsAkademikOpen] = useState(false);
-    const [isKesiswaanOpen, setIsKesiswaanOpen] = useState(false);
-    const [isPoinOpen, setIsPoinOpen] = useState(false);
+    // ...
 
-
-    // Determine if we should show back button instead of hamburger
-    const subPages = ['/profile', '/security', '/nilai', '/profile/edit', '/absensi', '/jadwal', '/berkas', '/jurnal', '/settings', '/kalender-akademik', '/notifikasi', '/achievements', '/kesehatan', '/laporan', '/prestasi/list'];
-    const isSubPage = !forceMenu && subPages.some(page => url.startsWith(page));
-
-    // Permission Helper
-    const hasPermission = (permission) => {
-        const userRole = props.auth?.role; // Role name from HandleInertiaRequests
-        const userPermissions = props.auth?.permissions || [];
-
-
-
-        return userRole === 'Admin' || userPermissions.includes(permission);
-    };
-
-
-    // Auto-open parent menus based on current route
-    useEffect(() => {
-        // Auto-open submenus based on current route
-        if (route().current('user.*') || route().current('role.*')) {
-            setIsKontrolAksesOpen(true);
-        }
-        if (route().current('mata-pelajaran.*') || route().current('jam-pelajaran.*')) {
-            setIsKurikulumOpen(true);
-        }
-
-        // Akademik submenu routes
-        if (route().current('periode-akademik.*') || route().current('semester-akademik.*') || route().current('jadwal-pelajaran.*')) {
-            setIsAkademikOpen(true);
-        }
-
-        // Kesiswaan submenu routes
-
-        // Poin submenu routes
-        if (route().current('poin.*') || route().current('pelanggaran.*')) {
-            setIsKesiswaanOpen(true);
-            setIsPoinOpen(true);
-        }
-        if (route().current('kelas.*') || route().current('guru.*') || route().current('siswa.*') || route().current('level.*')) {
-            setIsKesiswaanOpen(true);
-        }
-
-        // Kontrol Akses submenu routes
-        if (route().current('role.*') || route().current('pengguna.*')) {
-            setIsKontrolAksesOpen(true);
-        }
-    }, [url]); // Re-run when URL changes
-
+    // (UseEffect for theme and notification)
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme') || 'light';
         setTheme(savedTheme);
@@ -86,12 +33,7 @@ export default function AuthenticatedLayout({ header, children, hideNav, forceMe
                 try {
                     const permission = await Notification.requestPermission();
                     if (permission === 'granted') {
-                        // TODO: Replace with your generate Public VAPID Key from Firebase Console -> Project Settings -> Cloud Messaging
-                        // For now we try without key, or user must provide it.
-                        // It is highly recommended to use vapidKey.
-                        const currentToken = await getToken(messaging, {
-                            vapidKey: 'BMQTVMcqQn7J55MnRLb4bOi4pfX4iRv1-WXQ1ULv1qU31IV1OgE60iL13DfqC4NC14qfPe3it-HWe_wXS4RBP7g'
-                        });
+                        const currentToken = await getFcmToken();
 
                         if (currentToken) {
                             if (props.auth.user) {

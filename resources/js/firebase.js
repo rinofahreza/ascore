@@ -21,4 +21,18 @@ try {
     console.error("Firebase Messaging not supported in this browser:", error);
 }
 
-export { app, messaging, getToken };
+const getFcmToken = async () => {
+    if (!messaging) return null;
+    try {
+        const registration = await navigator.serviceWorker.register('/fcm-sw.js');
+        return await getToken(messaging, {
+            vapidKey: 'BMQTVMcqQn7J55MnRLb4bOi4pfX4iRv1-WXQ1ULv1qU31IV1OgE60iL13DfqC4NC14qfPe3it-HWe_wXS4RBP7g',
+            serviceWorkerRegistration: registration
+        });
+    } catch (error) {
+        console.error("An error occurred while retrieving token.", error);
+        return null;
+    }
+};
+
+export { app, messaging, getFcmToken };
