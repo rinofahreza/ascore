@@ -27,6 +27,7 @@ class User extends Authenticatable
         'cabang_id',
         'departemen_id',
         'is_active',
+        'fcm_token',
     ];
 
     /**
