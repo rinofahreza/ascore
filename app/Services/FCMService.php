@@ -44,13 +44,8 @@ class FCMService
         }
 
         try {
-            // Combine standard data with title/body for Data-Only message
-            $dataPayload = array_merge($data, [
-                'title' => $title,
-                'body' => $body,
-                'image' => $image,
-                'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
-            ]);
+            // Prepare Notification object
+            $notification = Notification::create($title, $body, $image);
 
             // Add WebPush Config for Click Action
             $webPush = WebPushConfig::fromArray([
@@ -59,12 +54,22 @@ class FCMService
                 ],
             ]);
 
-            // Send as Data-Only message (no 'withNotification')
-            // This forces the Service Worker to handle display, avoiding system duplicates 
-            // and bypassing system suppression issues.
+            // Android Specific Config to force priority and visibility
+            $androidConfig = \Kreait\Firebase\Messaging\AndroidConfig::fromArray([
+                'priority' => 'high',
+                'notification' => [
+                    'priority' => 'high', // MAX priority
+                    'default_sound' => true,
+                    'default_vibrate_timings' => true,
+                    'visibility' => 'public',
+                ],
+            ]);
+
             $message = CloudMessage::withTarget('token', $token)
+                ->withNotification($notification)
                 ->withWebPushConfig($webPush)
-                ->withData($dataPayload);
+                ->withAndroidConfig($androidConfig)
+                ->withData($data);
 
             $result = $this->messaging->send($message);
             return $result;
