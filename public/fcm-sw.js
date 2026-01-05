@@ -20,12 +20,40 @@ messaging.onBackgroundMessage(function (payload) {
     // We only need to manually show notification if we are sending "Data Messages" (without 'notification' key).
 
     // Check if it's a data-only message before showing notification manually
-    // if (payload.data && !payload.notification) {
-    //     const notificationTitle = payload.data.title || 'New Notification';
-    //     const notificationOptions = {
-    //         body: payload.data.body,
-    //         icon: '/logo.png'
-    //     };
-    //     self.registration.showNotification(notificationTitle, notificationOptions);
-    // }
+    if (payload.data && !payload.notification) {
+        const notificationTitle = payload.data.title || 'New Notification';
+        const notificationOptions = {
+            body: payload.data.body,
+            icon: '/icons/icon-192x192.png',
+            data: payload.data // Pass data for click handling
+        };
+
+        // Show notification manually
+        self.registration.showNotification(notificationTitle, notificationOptions);
+    }
+});
+
+// Handle Notification Click
+self.addEventListener('notificationclick', function (event) {
+    console.log('[firebase-messaging-sw.js] Notification click Received.', event);
+    event.notification.close();
+
+    const urlToOpen = (event.notification.data && event.notification.data.url) ? event.notification.data.url : '/';
+
+    // Open the app and navigate
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (windowClients) {
+            // Check if there is already a window/tab open with the target URL
+            for (let i = 0; i < windowClients.length; i++) {
+                const client = windowClients[i];
+                if (client.url === urlToOpen && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            // If not, open a new window
+            if (clients.openWindow) {
+                return clients.openWindow(urlToOpen);
+            }
+        })
+    );
 });

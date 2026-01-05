@@ -109,7 +109,11 @@ export default function AuthenticatedLayout({ header, children, hideNav, forceMe
         if (messaging) {
             const unsubscribe = onMessage(messaging, (payload) => {
                 console.log('Foreground Message received. ', payload);
-                const { title, body, icon } = payload.notification || {};
+                // Support both Notification payload and Data-Only payload
+                const notification = payload.notification || payload.data || {};
+                const { title, body, icon } = notification;
+
+                // For data-only, it might be nested or flat, usually flat in payload.data
 
                 // Manually show notification if app is in foreground
                 // Note: This requires the 'Notification' permission to be 'granted' which we checked above

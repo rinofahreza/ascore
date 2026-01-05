@@ -44,8 +44,13 @@ class FCMService
         }
 
         try {
-            // Prepare Notification object
-            $notification = Notification::create($title, $body, $image);
+            // Combine standard data with title/body for Data-Only message
+            $dataPayload = array_merge($data, [
+                'title' => $title,
+                'body' => $body,
+                'image' => $image,
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
+            ]);
 
             // Add WebPush Config for Click Action
             $webPush = WebPushConfig::fromArray([
@@ -54,10 +59,12 @@ class FCMService
                 ],
             ]);
 
+            // Send as Data-Only message (no 'withNotification')
+            // This forces the Service Worker to handle display, avoiding system duplicates 
+            // and bypassing system suppression issues.
             $message = CloudMessage::withTarget('token', $token)
-                ->withNotification($notification)
                 ->withWebPushConfig($webPush)
-                ->withData($data);
+                ->withData($dataPayload);
 
             $result = $this->messaging->send($message);
             return $result;
