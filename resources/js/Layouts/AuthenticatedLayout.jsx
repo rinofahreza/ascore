@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import useThemeColor from '@/Hooks/useThemeColor';
 import { Link, usePage } from '@inertiajs/react';
 import { messaging, getFcmToken } from '../firebase';
+import { onMessage } from "firebase/messaging";
 import axios from 'axios';
 
 export default function AuthenticatedLayout({ header, children, hideNav, forceMenu = false }) {
@@ -101,6 +102,29 @@ export default function AuthenticatedLayout({ header, children, hideNav, forceMe
         };
 
         requestNotificationPermission();
+    }, []);
+
+    // Foreground Message Listener
+    useEffect(() => {
+        if (messaging) {
+            const unsubscribe = onMessage(messaging, (payload) => {
+                console.log('Foreground Message received. ', payload);
+                const { title, body, icon } = payload.notification || {};
+
+                // Manually show notification if app is in foreground
+                // Note: This requires the 'Notification' permission to be 'granted' which we checked above
+                if (Notification.permission === 'granted' && title) {
+                    new Notification(title, {
+                        body: body,
+                        icon: icon || '/icons/icon-192x192.png',
+                    });
+                }
+            });
+
+            return () => {
+                unsubscribe();
+            };
+        }
     }, []);
 
     const toggleTheme = () => {
