@@ -271,6 +271,11 @@ class PostController extends Controller
 
         $usersToNotify = $usersToNotify->merge($previousCommenters)->unique();
 
+        \Log::info("DEBUG REPLY: Current User: " . auth()->id());
+        \Log::info("DEBUG REPLY: Post Owner: " . $post->user_id);
+        \Log::info("DEBUG REPLY: Previous Commenters: " . json_encode($previousCommenters));
+        \Log::info("DEBUG REPLY: Users to Notify: " . json_encode($usersToNotify));
+
 
 
         // Create notifications for all participants AND Send FCM
@@ -293,6 +298,7 @@ class PostController extends Controller
             // Send FCM
             $targetUser = \App\Models\User::find($userId);
             if ($targetUser && $targetUser->fcm_token) {
+                \Log::info("DEBUG REPLY: Sending to User " . $userId . " | Token exists? YES");
                 $title = "Komentar Baru 💬";
                 $body = auth()->user()->name . " mengomentari postingan: \"" . substr($request->input('content'), 0, 30) . "...\"";
 
@@ -300,7 +306,10 @@ class PostController extends Controller
                     'url' => route('post.show', $post->id),
                 ];
 
-                $fcmService->sendToToken($targetUser->fcm_token, $title, $body, $dataPayload);
+                $response = $fcmService->sendToToken($targetUser->fcm_token, $title, $body, $dataPayload);
+                \Log::info("DEBUG REPLY: Send Result: " . json_encode($response));
+            } else {
+                \Log::info("DEBUG REPLY: Skip User " . $userId . " | Token exists? " . ($targetUser && $targetUser->fcm_token ? 'YES' : 'NO'));
             }
         }
 
