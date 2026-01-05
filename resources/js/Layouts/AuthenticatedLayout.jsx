@@ -114,10 +114,22 @@ export default function AuthenticatedLayout({ header, children, hideNav, forceMe
                 // Manually show notification if app is in foreground
                 // Note: This requires the 'Notification' permission to be 'granted' which we checked above
                 if (Notification.permission === 'granted' && title) {
-                    new Notification(title, {
-                        body: body,
-                        icon: icon || '/icons/icon-192x192.png',
-                    });
+                    // Use ServiceWorkerRegistration to show notification (Better for Android)
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.ready.then(registration => {
+                            registration.showNotification(title, {
+                                body: body,
+                                icon: icon || '/icons/icon-192x192.png',
+                                data: payload.data // Pass data for click handling
+                            });
+                        });
+                    } else {
+                        // Fallback for non-SW environments
+                        new Notification(title, {
+                            body: body,
+                            icon: icon || '/icons/icon-192x192.png',
+                        });
+                    }
                 }
             });
 
