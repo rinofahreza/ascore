@@ -14,6 +14,17 @@ firebase.initializeApp(firebaseConfig);
 
 const messaging = firebase.messaging();
 
+// Force Service Worker to update immediately
+self.addEventListener('install', function (event) {
+    console.log('[fcm-sw.js] Service Worker installed.');
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', function (event) {
+    console.log('[fcm-sw.js] Service Worker activated.');
+    event.waitUntil(clients.claim());
+});
+
 messaging.onBackgroundMessage(function (payload) {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
     // If payload contains a notification property, the browser/SDK automatically shows a notification.

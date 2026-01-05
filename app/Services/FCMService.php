@@ -54,21 +54,16 @@ class FCMService
                 ],
             ]);
 
-            // Android Specific Config to force priority and visibility
-            $androidConfig = \Kreait\Firebase\Messaging\AndroidConfig::fromArray([
-                'priority' => 'high',
-                'notification' => [
-                    'priority' => 'high', // MAX priority
-                    'default_sound' => true,
-                    'default_vibrate_timings' => true,
-                    'visibility' => 'public',
+            // Add WebPush Config for Click Action
+            $webPush = WebPushConfig::fromArray([
+                'fcm_options' => [
+                    'link' => $data['url'] ?? env('APP_URL'),
                 ],
             ]);
 
             $message = CloudMessage::withTarget('token', $token)
                 ->withNotification($notification)
                 ->withWebPushConfig($webPush)
-                ->withAndroidConfig($androidConfig)
                 ->withData($data);
 
             $result = $this->messaging->send($message);
